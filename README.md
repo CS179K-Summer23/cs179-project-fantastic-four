@@ -34,3 +34,22 @@ Sequelize.js
 8.Viewer count, stream title, and other streaming information about the video being   
 9.Following streamers and email notifications  
 
+# User Stories
+As a viewer, I want to be able to watch livestreams so that I can be entertained. (4 points)
+
+As a streamer, I want to be able to stream my games or videos so that my community can enjoy my content. (4 points)
+
+As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
+
+As a viewer, I want to be able to follow the streamer’s account and receive the notification when they start streaming. (2 point)
+
+As a user, I want to be able to login so that I can keep track of the streamers that I watch seamlessly and be able to easily talk to others in chat. (2 points)
+
+As a streamer, I want to be able to delete messages in my chat, as well as allow others to delete messages so that the chat can be enjoyable to read. (1 point)
+
+As a streamer, I want to check the chat history when I was streaming. So I can interact with viewers. (1 point)
+
+As a user, I want to be able to add information to my profile because I want to be able to personalize my profile. (1 point)
+
+As a user, I want to be able to donate to streamers because I want to be able to support the content creators that I am familiar with. (1 point)
+
