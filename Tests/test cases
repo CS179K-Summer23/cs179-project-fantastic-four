@@ -21,3 +21,12 @@ Expected Outcome: User should not be able to stream if the streamkey is invalid.
 
 Test Case: View Streamkey
 Expected Outcome: After creating an account, user should be able to view the stream key in settings.
+
+
+User Story: As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
+
+Test Case: User send the message
+Expected Outcome: Message is showed in the streaming room.
+
+Test Case: Sync the message
+Expected Outcome: Everyone in same streaming room can see the same message.
