@@ -7,30 +7,30 @@ A live-streaming web application similar to Twitch. Users will be able to sign u
 
 # Team Members
 
-Jaired Jawed - JaireddJawed
-Linqing Li - 
-Pallav Datusalia - notpallav
-Zhenjie Liu - 2314577483
+Jaired Jawed - JaireddJawed  
+Linqing Li -   
+Pallav Datusalia - notpallav  
+Zhenjie Liu - 2314577483  
 
 # Technologies 
 
-React
-Express
-WebRTC
-nginx-rtmp-server
-Socket.io
-PostgreSQL
-Sequelize.js
+React  
+Express  
+WebRTC  
+nginx-rtmp-server  
+Socket.io  
+PostgreSQL  
+Sequelize.js  
 
 # Major Features:
 
-1.Transmit video (WebRTC)
-2.Receive video (WebRTC)
-3.Authentication 
-4.Sending/Deleting Messages in Chat (Websockets)
-5.Store chat history 
-6.Profile Page with user information like a bio
-7.Donation system w/ Stripe (???)
-8.Viewer count, stream title, and other streaming information about the video being 
-9.Following streamers and email notifications
+1.Transmit video (WebRTC)  
+2.Receive video (WebRTC)  
+3.Authentication   
+4.Sending/Deleting Messages in Chat (Websockets)  
+5.Store chat history   
+6.Profile Page with user information like a bio  
+7.Donation system w/ Stripe (???)  
+8.Viewer count, stream title, and other streaming information about the video being   
+9.Following streamers and email notifications  
 
