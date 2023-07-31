@@ -9,3 +9,15 @@ Expected Outcome: User should be able to create an account if the email and user
 
 Test Case: Reset Password
 Expected Outcome: User should be able to get a password reset link sent to their email if the email is valid and the account exists
+
+
+User Story: As a streamer, I want to be able to stream my games or videos so that my community can enjoy my content. (4 points)
+
+Test Case: Start streaming with Valid Streamkey
+Expected Outcome: User should be able to stream if the streamkey is valid.
+
+Test Case: Start streaming with Invalid Streamkey
+Expected Outcome: User should not be able to stream if the streamkey is invalid.
+
+Test Case: View Streamkey
+Expected Outcome: After creating an account, user should be able to view the stream key in settings.
