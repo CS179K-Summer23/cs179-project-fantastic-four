@@ -1,0 +1,11 @@
+Test Case: Login to Account
+Expected Outcome: User should be able to login to account if authentication credentials are correct
+
+Test Case: Deny Login to Account
+Expected Outcome: User should not be able to login to account if authentication credentials are incorrect
+
+Test Case: Create Account
+Expected Outcome: User should be able to create an account if the email and username are not already in use and the password is valid
+
+Test Case: Reset Password
+Expected Outcome: User should be able to get a password reset link sent to their email if the email is valid and the account exists
