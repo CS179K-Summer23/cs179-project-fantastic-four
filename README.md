@@ -8,7 +8,7 @@ A live-streaming web application similar to Twitch. Users will be able to sign u
 # Team Members
 
 Jaired Jawed - JaireddJawed  
-Linqing Li -   
+Linqing Li -  Lanceart
 Pallav Datusalia - notpallav  
 Zhenjie Liu - 2314577483  
 
