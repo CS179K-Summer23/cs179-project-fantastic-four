@@ -7,23 +7,15 @@ function Homepage(): JSX.Element {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <nav className="flex items-center justify-between flex-wrap bg-teal-500 p-6">
-        <div className="flex items-center flex-shrink-0 text-white mr-6">
+      <nav className="flex items-center justify-between bg-gray-900 flex-wrap p-6">
+        <div className="flex items-center flex-shrink-0 text-teal-200 mr-6">
           <a className="font-semibold text-xl tracking-tight" href="#">Fantastic Four</a>
-        </div>
-        <div className="block lg:hidden">
-          <button className="flex items-center px-3 py-2 border rounded text-teal-200 border-teal-400 hover:text-white hover:border-white">
-            <svg className="fill-current h-3 w-3" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-              <title>Menu</title>
-              <path d="M0 3h20v2H0V3zm0 6h20v2H0V9zm0 6h20v2H0v-2z" />
-            </svg>
-          </button>
         </div>
         <div className="w-full block flex-grow lg:flex lg:items-center lg:w-auto">
           <div className="text-sm lg:flex-grow">
-            <a href="#" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">Home</a>
-            <a href="#" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4">Streams</a>
-            <a href="#" className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white">Categories</a>
+            <a href="#" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4">Home</a>
+            <a href="#" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white mr-4">Streams</a>
+            <a href="#" className="block mt-4 lg:inline-block lg:mt-0 text-white hover:text-white">Categories</a>
           </div>
           <div>
             <form className="text-sm">
@@ -41,7 +33,7 @@ function Homepage(): JSX.Element {
       <div className="container mx-auto px-4">
         <div className="w-full max-w-md mx-auto mt-4">
           <div className="relative pt-3/2">
-            <iframe className="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/tgbNymZ7vqY" allowFullScreen></iframe>
+            
           </div>
         </div>
 
@@ -58,6 +50,7 @@ function Homepage(): JSX.Element {
                     <div className="px-6 py-4">
                       <div className="font-bold text-xl mb-2">Stream Title</div>
                       <p className="text-gray-700 text-base">Stream description here...</p>
+                      <a href="/streamingroom">Join the room</a>
                     </div>
                   </div>
                 </div>
