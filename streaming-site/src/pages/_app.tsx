@@ -1,6 +1,12 @@
-import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
+import '../styles/globals.css'
 
-export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+function MyApp({ Component, pageProps }: AppProps) {
+  return (
+    <div className="bg-gray-50 dark:bg-gray-800 inset-0 absolute h-full w-full overflow-auto">
+      <Component {...pageProps} />
+    </div>
+  )
 }
+
+export default MyApp
