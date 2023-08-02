@@ -25,7 +25,7 @@ function Signup(): JSX.Element {
           {({ handleSubmit }): JSX.Element => (
             <Form onSubmit={handleSubmit}>
               <div className="flex flex-col items-center">
-
+                {/* Insert Logo Here */}
               </div>
               {errorMessage && (<div className="p-2 mb-4 bg-red-500 text-white text-center">{errorMessage}</div>)}
               <Input name="name" label="Name" autoFocus />

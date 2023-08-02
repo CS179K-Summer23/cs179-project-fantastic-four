@@ -33,7 +33,7 @@ function SignIn(): JSX.Element {
           {({ handleSubmit }): JSX.Element => (
             <Form onSubmit={handleSubmit}>
               <div className="flex flex-col items-center">
-
+                {/* Insert Logo Here */}
               </div>
               {error && <div className="bg-red-500 text-center text-white p-2 mb-6">{error}</div>}
               <Input name="email" label="Email" autoFocus />

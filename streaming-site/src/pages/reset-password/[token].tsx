@@ -34,7 +34,7 @@ function ResetPasswordToken(): JSX.Element {
           {({ handleSubmit }): JSX.Element => (
             <Form onSubmit={handleSubmit}>
               <div className="flex flex-col items-center">
-                
+                {/* Insert Logo Here */}
               </div>
               <Input name="password" label="Password" type="password" />
               <Input name="confirmPassword" label="Confirm Password" type="password" />

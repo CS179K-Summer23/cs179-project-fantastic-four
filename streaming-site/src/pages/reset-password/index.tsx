@@ -23,7 +23,7 @@ function ResetPasswordIndex(): JSX.Element {
           {({ handleSubmit }): JSX.Element => (
             <Form onSubmit={handleSubmit}>
               <div className="flex flex-col items-center">
-
+                {/* Insert Logo Here */}
               </div>
               <Input name="email" label="Email" autoFocus />
               <div className="text-center my-6">
