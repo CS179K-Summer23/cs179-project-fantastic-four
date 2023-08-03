@@ -11,6 +11,7 @@ const StyledInput = styled.input`
   outline-none
   border dark:border-blue-400 border-gray-300
   dark:focus:border-blue-500 focus:border-gray-500
+  text-center
 `;
 
 interface InputProps {
