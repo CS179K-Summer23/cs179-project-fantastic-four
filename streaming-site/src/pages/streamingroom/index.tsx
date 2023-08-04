@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
@@ -11,7 +12,7 @@ function StreamingRoom(): JSX.Element {
         <div className="container mx-auto py-2 flex flex-col-reverse md:flex-row">
           <section className="w-full md:w-2/3 p-4">
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
-              <div style={{ position: "relative", paddingBottom: "56.25%" }}>
+              <div className="relative" style={{ paddingBottom: "56.25%" }}>
                 <iframe
                   src="https://www.youtube.com/embed/SqcY0GlETPk"
                   style={{
@@ -27,10 +28,18 @@ function StreamingRoom(): JSX.Element {
                 ></iframe>
               </div>
               <div className="mt-4">
-                <h2 className="font-bold text-xl mb-2">Stream Title</h2>
-                <p className="text-gray-700 text-base">
-                  Stream description here...
-                </p>
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/149/149071.png?w=740&t=st=1691147917~exp=1691148517~hmac=eb6166a62265ce27b7afac68d87a03b748bc37c5361e49e55c8ced8a2f60e2db"
+                  className="mt-2 w-7 h-7 rounded-full float-left mr-2"
+                  alt="Streamer avatar"
+                />
+                <div>
+                  <h2 className="font-bold text-xl mb-2">Stream Title</h2>
+
+                  <p className="pl-9 text-gray-700 text-base">
+                    Stream description here...
+                  </p>
+                </div>
               </div>
             </div>
           </section>
