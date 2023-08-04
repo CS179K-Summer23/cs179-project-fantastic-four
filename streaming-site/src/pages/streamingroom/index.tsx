@@ -36,11 +36,13 @@ function StreamingRoom(): JSX.Element {
           </section>
 
           <section
-            className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white"
+            className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
             style={{ maxWidth: "350px" }}
           >
             <div className="bg-white">
-              <h2 className="font-bold text-center border-b-2 text-m pb-1">STREAM CHAT</h2>
+              <h2 className="font-bold text-center border-b-2 text-m pb-1">
+                STREAM CHAT
+              </h2>
               <div className="chat-container p-0 m-0">{/* Chat content */}</div>
             </div>
 
