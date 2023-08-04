@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
-const Navbar = () => {
+function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -52,6 +52,7 @@ const Navbar = () => {
             Categories
           </Link>
         </div>
+
         <div>
           <form className="text-sm mr-20 flex pb-2">
             <input
@@ -98,6 +99,6 @@ const Navbar = () => {
       </div>
     </nav>
   );
-};
+}
 
 export default Navbar;
