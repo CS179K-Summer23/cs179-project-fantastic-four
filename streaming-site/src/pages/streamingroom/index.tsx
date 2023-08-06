@@ -1,9 +1,22 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 
 function StreamingRoom(): JSX.Element {
+  const [messages, setMessages] = useState<string[]>([]);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (inputRef.current && inputRef.current.value.trim() !== "") {
+      setMessages([...messages, inputRef.current.value.trim()]);
+      inputRef.current.value = ""; // clear the input field
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
@@ -52,16 +65,21 @@ function StreamingRoom(): JSX.Element {
               <h2 className="font-bold text-center border-b-2 text-m pb-1">
                 STREAM CHAT
               </h2>
-              <div className="chat-container p-0 m-0">{/* Chat content */}</div>
+              <div className="chat-container p-2 m-0 overflow-y-auto">
+                {messages.map((message, index) => (
+                  <p key={index}>{message}</p>
+                ))}
+              </div>
             </div>
 
-            <form className="my-4 flex bg-white m">
+            <form className="my-4 flex bg-white m" onSubmit={handleSubmit}>
               <input
                 className="w-full rounded-l-lg p-2 border border-blue-500"
                 type="text"
                 placeholder="Write a message..."
+                ref={inputRef}
               />
-              <button className="py-2 px-2 bg-transparent bg-blue-500 text-blue-700 font-semibold hover:text-white border border-blue-500 hover:border-transparent rounded-r-lg">
+              <button className="py-2 px-2 bg-transparent bg-blue-500 text-blue-700 font-semibold hover:text-white border hover:bg-blue-500 border-blue-500 hover:border-transparent rounded-r-lg">
                 Send
               </button>
             </form>
