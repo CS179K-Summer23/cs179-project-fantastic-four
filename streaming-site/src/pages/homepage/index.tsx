@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Link from "next/link";
@@ -7,6 +7,22 @@ import Link from "next/link";
 function Homepage(): JSX.Element {
   const categories = ["Following", "VALORANT", "League of Legends"];
   const streams = [1, 2, 3];
+  const videos = [
+    "https://www.youtube.com/embed/6QnTNKOJk5A",
+    "https://www.youtube.com/embed/SqcY0GlETPk",
+    "https://www.youtube.com/embed/yEHCfRWz-EI",
+  ];
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const nextVideo = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % videos.length);
+  };
+
+  const prevVideo = () => {
+    setCurrentIndex(
+      (prevIndex) => (prevIndex - 1 + videos.length) % videos.length
+    );
+  };
 
   const streamerAvatarUrl = "https://url-to-streamer-avatar.com/avatar.jpg"; // replace with real avatar URL
 
@@ -17,10 +33,12 @@ function Homepage(): JSX.Element {
       <main className="flex-1">
         <div className="container mx-auto p-8">
           <section>
-            {/* <h2 className="text-2xl font-bold my-4">Live Streaming Room</h2> */}
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
               <div className="relative pb-3/2 p-4">
-                <button className="absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg">
+                <button
+                  onClick={prevVideo}
+                  className="z-10 absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg"
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -36,7 +54,10 @@ function Homepage(): JSX.Element {
                     />
                   </svg>
                 </button>
-                <button className="absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg ">
+                <button
+                  onClick={nextVideo}
+                  className="z-10 absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg "
+                >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="none"
@@ -52,6 +73,16 @@ function Homepage(): JSX.Element {
                     />
                   </svg>
                 </button>
+                <div
+                  className="relative w-full h-0"
+                  style={{ paddingBottom: "56.25%" }}
+                >
+                  <iframe
+                    src={videos[currentIndex]}
+                    className="z-0 absolute top-0 left-0 w-full h-full"
+                    allowFullScreen
+                  ></iframe>
+                </div>
               </div>
             </div>
           </section>
