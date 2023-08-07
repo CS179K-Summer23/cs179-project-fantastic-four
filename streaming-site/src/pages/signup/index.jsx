@@ -3,10 +3,13 @@ import Redirect from 'next/router'
 import Link from 'next/link'
 import { Formik, Form } from 'formik'
 import { object, string } from 'yup'
+import { createUserWithEmailAndPassword } from "firebase/auth"
 import Input from '../../components/input'
+import { getFirebaseApp } from '../../utils/firebase.config'
 
-function Signup(): JSX.Element {
+function Signup() {
   const [errorMessage, setErrorMessage] = useState('')
+  const { auth } = getFirebaseApp()
 
   return (
     <div className="flex justify-center items-center m-6 md:m-0 flex-col h-full">
@@ -19,10 +22,23 @@ function Signup(): JSX.Element {
             password: string().min(8).required(),
           })}
           onSubmit={({ name, email, password }, { setSubmitting }) => {
+            setSubmitting(true)
+            setErrorMessage('')
 
+            createUserWithEmailAndPassword(auth, email, password)
+              .then((userCredential) => {
+                const user = userCredential.user
+                console.log(user)
+                Redirect.push('/dashboard')
+              })
+              .catch((error) => {
+                const errorMessage = error.message
+                setErrorMessage(errorMessage)
+                setSubmitting(false)
+              })
           }}
         >
-          {({ handleSubmit }): JSX.Element => (
+          {({ handleSubmit }) => (
             <Form onSubmit={handleSubmit}>
               <div className="flex flex-col items-center">
                 {/* Insert Logo Here */}
