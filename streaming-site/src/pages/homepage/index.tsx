@@ -10,9 +10,9 @@ function Homepage(): JSX.Element {
   const categories = ["Following", "VALORANT", "League of Legends"];
   const streams = [1, 2, 3];
   const videos = [
-    "https://www.youtube.com/embed/6QnTNKOJk5A",
-    "https://www.youtube.com/embed/SqcY0GlETPk",
-    "https://www.youtube.com/embed/yEHCfRWz-EI",
+    "https://34.83.97.105/streams/spacex/index.m3u8",
+    "https://34.83.97.105/streams/obs/index.m3u8",
+    "https://34.83.97.105/streams/mobile/index.m3u8",
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -75,7 +75,7 @@ function Homepage(): JSX.Element {
                     />
                   </svg>
                 </button>
-                <Link href="/streamingroom">
+                <Link href="/streamingroom1">
                   <div
                     className="relative w-full cursor-pointer"
 
@@ -86,7 +86,8 @@ function Homepage(): JSX.Element {
                         muted
                         controls
                         preload="auto"
-                        src='https://34.83.97.105/streams/obs/index.m3u8'
+                        src={videos[currentIndex]}
+                        // src='https://34.83.97.105/streams/obs/index.m3u8'
                       />
                     </div>
                   </div>
@@ -113,7 +114,7 @@ function Homepage(): JSX.Element {
                     </div>
 
                     <div className="">
-                      <Link href="/streamingroom">
+                      <Link href="/streamingroom1">
                         <div
                           className="relative"
                           style={{ paddingBottom: "56.25%" }}
@@ -153,12 +154,12 @@ function Homepage(): JSX.Element {
                         />
                         <div className="pl-9">
                           <h3 className="font-bold text-xl hover:text-gray-500">
-                            <Link href="/streamingroom">
+                            <Link href="/streamingroom3">
                               Stream Title {stream}
                             </Link>
                           </h3>
                           <Link
-                            href="/streamingroom"
+                            href="/streamingroom2"
                             className="text-sm text-gray-700 hover:text-gray-500"
                           >
                             Stream description here...
