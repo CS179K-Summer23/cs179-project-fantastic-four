@@ -41,7 +41,7 @@ function StreamingRoom(): JSX.Element {
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
               <div className="relative" style={{ paddingBottom: "56.25%" }}>
                 <iframe
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
                   style={{
                     position: "absolute",
                     top: 0,

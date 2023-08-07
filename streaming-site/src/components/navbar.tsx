@@ -5,13 +5,13 @@ function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 pt-1">
+    <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 py-1">
       <div className="flex items-center flex-shrink-0 text-white mr-6">
         <Link href="/homepage" className="font-semibold text-xl tracking-tight">
           Fantastic Four
         </Link>
       </div>
-      <div className="block lg:hidden">
+      <div className="block lg:hidden pb-2">
         <button
           onClick={() => setIsOpen(!isOpen)}
           className="flex items-center px-3 py-2 border rounded text-teal-200 border-teal-400 hover:text-white hover:border-white"
