@@ -4,16 +4,30 @@ import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 
 function StreamingRoom(): JSX.Element {
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
+    []
+  );
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  // const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const formatTimestamp = (timestamp: Date) => {
+    const options: Intl.DateTimeFormatOptions = {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    };
+    return new Intl.DateTimeFormat("en-US", options).format(timestamp);
+  };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (inputRef.current && inputRef.current.value.trim() !== "") {
-      setMessages([...messages, inputRef.current.value.trim()]);
-      inputRef.current.value = ""; // clear the input field
+      setMessages([
+        ...messages,
+        { text: inputRef.current.value.trim(), timestamp: new Date() },
+      ]);
+      inputRef.current.value = "";
     }
   };
 
@@ -27,7 +41,7 @@ function StreamingRoom(): JSX.Element {
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
               <div className="relative" style={{ paddingBottom: "56.25%" }}>
                 <iframe
-                  src="https://www.youtube.com/embed/SqcY0GlETPk"
+                  src="https://www.youtube.com/embed/dQw4w9WgXcQ"
                   style={{
                     position: "absolute",
                     top: 0,
@@ -102,7 +116,15 @@ function StreamingRoom(): JSX.Element {
               </h2>
               <div className="chat-container p-2 m-0 overflow-y-auto">
                 {messages.map((message, index) => (
-                  <p key={index}>{message}</p>
+                  <div key={index} className="mb-2">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600 text-sm">User123</span>
+                      <span className="text-gray-400 text-xs">
+                        {formatTimestamp(message.timestamp)}
+                      </span>
+                    </div>
+                    <p>{message.text}</p>
+                  </div>
                 ))}
               </div>
             </div>
