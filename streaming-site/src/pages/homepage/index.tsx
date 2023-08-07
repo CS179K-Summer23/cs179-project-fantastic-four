@@ -73,16 +73,18 @@ function Homepage(): JSX.Element {
                     />
                   </svg>
                 </button>
-                <div
-                  className="relative w-full h-0"
-                  style={{ paddingBottom: "56.25%" }}
-                >
-                  <iframe
-                    src={videos[currentIndex]}
-                    className="z-0 absolute top-0 left-0 w-full h-full"
-                    allowFullScreen
-                  ></iframe>
-                </div>
+                <Link href="/streamingroom">
+                  <div
+                    className="relative w-full h-0 cursor-pointer"
+                    style={{ paddingBottom: "56.25%" }}
+                  >
+                    {/* <iframe
+                      src={videos[currentIndex]}
+                      className="z-0 absolute top-0 left-0 w-full h-full"
+                      allowFullScreen
+                    ></iframe> */}
+                  </div>
+                </Link>
               </div>
             </div>
           </section>
@@ -105,24 +107,37 @@ function Homepage(): JSX.Element {
                     </div>
 
                     <div className="">
-                      <div
-                        className="relative"
-                        style={{ paddingBottom: "56.25%" }}
-                      >
-                        <iframe
-                          src="https://www.youtube.com/embed/SqcY0GlETPk"
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            width: "100%",
-                            height: "100%",
-                          }}
-                          frameBorder="0"
-                          scrolling="no"
-                          allowFullScreen={true}
-                        ></iframe>
-                      </div>
+                      <Link href="/streamingroom">
+                        <div
+                          className="relative"
+                          style={{ paddingBottom: "56.25%" }}
+                        >
+                          <iframe
+                            src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/A_black_image.jpg/1280px-A_black_image.jpg"
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              zIndex: 1,
+                            }}
+                            frameBorder="0"
+                            scrolling="no"
+                            allowFullScreen={true}
+                          ></iframe>
+                          <div
+                            style={{
+                              position: "absolute",
+                              top: 0,
+                              left: 0,
+                              width: "100%",
+                              height: "100%",
+                              zIndex: 2, 
+                            }}
+                          ></div>
+                        </div>
+                      </Link>
 
                       <div>
                         <img
