@@ -48,7 +48,7 @@ function Navbar() {
             href="/categories"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
-            Categories
+            Videos
           </Link>
         </div>
 
@@ -84,7 +84,7 @@ function Navbar() {
         <div className="flex items-center">
           <Link
             href="/signin"
-            className="inline-block text-sm ml-2 px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white lg:mt-0"
+            className="inline-block text-sm p-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white lg:mt-0"
           >
             Log In
           </Link>
