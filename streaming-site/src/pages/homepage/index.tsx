@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Link from "next/link";
-import Player from "@/components/player";
+import Player from "../../components/player";
 
 
 function Homepage(): JSX.Element {

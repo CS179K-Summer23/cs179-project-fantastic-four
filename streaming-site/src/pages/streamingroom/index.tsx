@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
-import Player from "@/components/player";
+import Player from "../../components/player";
 
 function StreamingRoom(): JSX.Element {
   const [messages, setMessages] = useState<string[]>([]);
