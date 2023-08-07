@@ -48,7 +48,7 @@ function StreamingRoom(): JSX.Element {
                 />
                 <div className="flex justify-between items-center">
                   <h2 className="font-bold text-xl mb-2">Stream Title</h2>
-                  <button className=" text-center bg-blue-500 text-white font-bold rounded-lg px-2 py-1 hover:bg-blue-600">
+                  <button className="text-center bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
@@ -109,12 +109,12 @@ function StreamingRoom(): JSX.Element {
 
             <form className="my-4 flex bg-white m" onSubmit={handleSubmit}>
               <input
-                className="w-full rounded-l-lg p-2 border border-blue-500"
+                className="w-full rounded-l-lg p-2 border border-gray-900"
                 type="text"
                 placeholder="Write a message..."
                 ref={inputRef}
               />
-              <button className="py-2 px-2 bg-transparent bg-blue-500 text-blue-700 font-semibold hover:text-white border hover:bg-blue-500 border-blue-500 hover:border-transparent rounded-r-lg">
+              <button className="py-2 px-2 bg-gray-900 text-white font-semibold hover:text-white border hover:bg-gray-600 border-gray-900 hover:border-transparent rounded-r-lg">
                 Send
               </button>
             </form>
