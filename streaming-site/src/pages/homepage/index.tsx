@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
+import Player from "../../components/player";
+
 import Link from "next/link";
 
 function Homepage(): JSX.Element {
@@ -75,14 +77,18 @@ function Homepage(): JSX.Element {
                 </button>
                 <Link href="/streamingroom">
                   <div
-                    className="relative w-full h-0 cursor-pointer"
-                    style={{ paddingBottom: "56.25%" }}
+                    className="relative w-full cursor-pointer"
+
                   >
-                    {/* <iframe
-                      src={videos[currentIndex]}
-                      className="z-0 absolute top-0 left-0 w-full h-full"
-                      allowFullScreen
-                    ></iframe> */}
+                    <div className="relative pb-3/2">
+                      <Player
+                        autoplay
+                        muted
+                        controls
+                        preload="auto"
+                        src='https://34.83.97.105/streams/obs/index.m3u8'
+                      />
+                    </div>
                   </div>
                 </Link>
               </div>

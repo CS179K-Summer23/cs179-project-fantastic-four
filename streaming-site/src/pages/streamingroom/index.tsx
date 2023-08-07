@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
+import Player from "../../components/player";
 
 function StreamingRoom(): JSX.Element {
   const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
@@ -39,20 +40,14 @@ function StreamingRoom(): JSX.Element {
         <div className="container mx-auto py-2 flex flex-col-reverse md:flex-row">
           <section className="w-full md:w-2/3 p-4">
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
-              <div className="relative" style={{ paddingBottom: "56.25%" }}>
-                <iframe
-                  src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1"
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    width: "100%",
-                    height: "100%",
-                  }}
-                  frameBorder="0"
-                  scrolling="no"
-                  allowFullScreen={true}
-                ></iframe>
+            <div className="relative">
+                <Player
+                  controls
+                  autoplay
+                  muted
+                  preload="auto"
+                  src='https://34.83.97.105/streams/obs/index.m3u8'
+                />
               </div>
               <div className="mt-2">
                 <img
