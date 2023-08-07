@@ -28,14 +28,8 @@ User Story: As a user, I want to chat with others on the stream so that I can co
 Test Case: User send the message
 Expected Outcome: Message is showed in the streaming room.
 
-Test Case: Sync the message
-Expected Outcome: Everyone in same streaming room can see the same message.
-
 
 User Story: As a viewer, I want to be able to watch livestreams so that I can be entertained. (4 points)
-
-Test Case: The viewer join the streaming room and no live stream.
-Expected Outcome: The window show the text “no streamer is streaming”
 
 Test Case: The viewer join the streaming room and someone is streaming.
 Expected Outcome: The viewer can see the video.
