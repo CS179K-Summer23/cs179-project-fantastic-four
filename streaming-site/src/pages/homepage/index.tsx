@@ -26,7 +26,6 @@ function Homepage(): JSX.Element {
     );
   };
 
-  const streamerAvatarUrl = "https://url-to-streamer-avatar.com/avatar.jpg"; // replace with real avatar URL
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -78,7 +77,6 @@ function Homepage(): JSX.Element {
                 <Link href="/streamingroom1">
                   <div
                     className="relative w-full cursor-pointer"
-
                   >
                     <div className="relative pb-3/2">
                       <Player
