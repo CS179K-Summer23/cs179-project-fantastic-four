@@ -23,12 +23,6 @@ Test Case: View Streamkey
 Expected Outcome: After creating an account, user should be able to view the stream key in settings.
 
 
-User Story: As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
-
-Test Case: User send the message
-Expected Outcome: Message is showed in the streaming room.
-
-
 User Story: As a viewer, I want to be able to watch livestreams so that I can be entertained. (4 points)
 
 Test Case: The viewer join the streaming room and someone is streaming.

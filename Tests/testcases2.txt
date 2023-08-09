@@ -1,0 +1,27 @@
+User Story: As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
+
+Test Case: User send the valid message
+Expected Outcome: Message is showed in the streaming room.
+
+Test Case: User send the empty message
+Expected Outcome: Display the notification said you can't send the empty message.
+
+User Story: As a user, I want to have a profile page which I can custome my profile picture, username, etc. (2 point)
+
+Test Case: User open the profile page
+Expected Outcome: Display the page which has option inlcude profile picture, username, birthday, age, email, debit.
+
+Test Case: User click change profile picture button
+Expected Outcome: Pop out the window to allow user to upload the image from the device.
+
+Test Case: User submit the form
+Ecpected Outcome: When everything is correct and unique, upload the information to the server. Otherwise, require user to change infomation.
+
+
+User Story: As a viewer, I want to be able to follow the streamer’s account and receive the notification when they start streaming. (2 point)
+
+Test Case: Click follow streamer button
+Expected Outcome: Change button text to unfollow. And add streamer to the following list.
+
+Test Case: Click unfollow streamer button
+Expected Outcome: Change button text to follow. And remove streamer from the following list.
