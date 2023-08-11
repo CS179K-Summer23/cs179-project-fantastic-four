@@ -6,6 +6,7 @@ import Player from "../../components/player";
 import Link from "next/link";
 import Modal from "react-modal";
 import DonationForm from "../../components/donation-form";
+import Chat from '../../components/chat';
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../../utils/firebase.config";
@@ -20,15 +21,6 @@ function StreamingRoom(): JSX.Element {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   // const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [followedList, setFollowedList] = useState<string[]>([]);
-
-  const formatTimestamp = (timestamp: Date) => {
-    const options: Intl.DateTimeFormatOptions = {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    };
-    return new Intl.DateTimeFormat("en-US", options).format(timestamp);
-  };
 
   const handleFollow = () => {
     const streamer = "StreamerUsername";
@@ -67,8 +59,6 @@ function StreamingRoom(): JSX.Element {
     setModalIsOpen(true);
   };
 
-
- 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
@@ -194,41 +184,7 @@ function StreamingRoom(): JSX.Element {
             </div>
           </section>
 
-          <section
-            className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
-            style={{ maxWidth: "350px" }}
-          >
-            <div className="bg-white">
-              <h2 className="font-bold text-center border-b-2 text-m pb-1">
-                STREAM CHAT
-              </h2>
-              <div className="chat-container p-2 m-0 overflow-y-auto">
-                {messages.map((message, index) => (
-                  <div key={index} className="mb-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">test</span>
-                      <span className="text-gray-400 text-xs">
-                        {formatTimestamp(message.timestamp)}
-                      </span>
-                    </div>
-                    <p>{message.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <form className="my-4 flex bg-white m" onSubmit={handleSubmit}>
-              <input
-                className="w-full rounded-l-lg p-2 border border-gray-900"
-                type="text"
-                placeholder="Write a message..."
-                ref={inputRef}
-              />
-              <button className="py-2 px-2 bg-gray-900 text-white font-semibold hover:text-white border hover:bg-gray-600 border-gray-900 hover:border-transparent rounded-r-lg">
-                Send
-              </button>
-            </form>
-          </section>
+         <Chat streamId="streamingroom1" />
         </div>
       </div>
 
