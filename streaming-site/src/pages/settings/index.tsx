@@ -180,6 +180,20 @@ function Settingpage(): JSX.Element {
                     className="w-full p-2 mt-1 rounded border cursor-not-allowed"
                   />
                 </div>
+
+                <div className="col-span-1">
+                  <label htmlFor="StreamURL" className="text-gray-700">
+                    StreamURL
+                  </label>
+                  <input
+                    disabled
+                    type="string"
+                    name="Streamkey"
+                    value="rtmp://34.83.113.52/live-stream"
+                    onChange={handleChange}
+                    className="w-full p-2 mt-1 rounded border cursor-not-allowed"
+                  />
+                </div>
                 
                 <div className="col-span-1">
                   <label htmlFor="debit" className="text-gray-700">
