@@ -10,8 +10,8 @@ function Homepage(): JSX.Element {
   const categories = ["Following", "VALORANT", "League of Legends"];
   const streams = [1, 2, 3];
   const videos = [
-    "https://www.youtube.com/embed/6QnTNKOJk5A",
-    "https://www.youtube.com/embed/SqcY0GlETPk",
+    "https://34.83.97.105/streams/obs/index.m3u8",
+    "https://34.83.97.105/streams/spacex/index.m3u8",
     "https://www.youtube.com/embed/yEHCfRWz-EI",
   ];
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -35,7 +35,7 @@ function Homepage(): JSX.Element {
           <section>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
               <div className="relative pb-3/2 p-4">
-                <Link href="/streamingroom">
+                <Link href="/streamingroom1">
                   <div className="relative w-full cursor-pointer">
                     <div className="relative pb-3/2">
                       <Player

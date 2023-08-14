@@ -6,6 +6,9 @@ import Player from "../../components/player";
 import Link from "next/link";
 import Modal from "react-modal";
 import DonationForm from "../../components/donation-form";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { getFirebaseApp } from "../../utils/firebase.config";
 
 function StreamingRoom(): JSX.Element {
   const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
@@ -51,6 +54,8 @@ function StreamingRoom(): JSX.Element {
     setModalIsOpen(true);
   };
 
+
+ 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
@@ -198,7 +203,7 @@ function StreamingRoom(): JSX.Element {
                 {messages.map((message, index) => (
                   <div key={index} className="mb-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">User123</span>
+                      <span className="text-gray-600 text-sm">test</span>
                       <span className="text-gray-400 text-xs">
                         {formatTimestamp(message.timestamp)}
                       </span>

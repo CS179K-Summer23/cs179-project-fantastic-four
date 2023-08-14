@@ -20,6 +20,7 @@ function Settingpage(): JSX.Element {
     birthday: 0,
     age: 0,
     debit: 0,
+    stream_key: "",
   });
 
   useEffect(() => {
@@ -128,7 +129,7 @@ function Settingpage(): JSX.Element {
           <section>
             <h2 className="text-xl font-bold mb-4">Profile Settings</h2>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
-              <div className="grid grid-rows-4 gap-4 w-full">
+              <div className="grid grid-rows-5 gap-4 w-full">
                 <div className="col-span-1">
                   <label htmlFor="name" className="text-gray-700">
                     Name
@@ -165,6 +166,21 @@ function Settingpage(): JSX.Element {
                     className="w-full p-2 mt-1 rounded border"
                   />
                 </div>
+
+                <div className="col-span-1">
+                  <label htmlFor="Streamkey" className="text-gray-700">
+                    Streamkey
+                  </label>
+                  <input
+                    disabled
+                    type="string"
+                    name="Streamkey"
+                    value={user?.stream_key}
+                    onChange={handleChange}
+                    className="w-full p-2 mt-1 rounded border cursor-not-allowed"
+                  />
+                </div>
+                
                 <div className="col-span-1">
                   <label htmlFor="debit" className="text-gray-700">
                     Debit
