@@ -1,30 +1,36 @@
-User Story: As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
+1. User Story: As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
 
-Test Case: User send the valid message
-Expected Outcome: Message is showed in the streaming room.
+Test Case: The user send the valid message
+Expected Outcome: The message is shown in the streaming room.
 
-Test Case: User send the empty message
+Test Case: The user send the empty message
 Expected Outcome: Display the notification said you can't send the empty message.
 
-User Story: As a user, I want to have a profile page which I can custome my profile picture, username, etc. (2 point)
+2. User Story: As a user, I want to have a profile page that can customize my profile picture, username, etc. (2 points)
 
-Test Case: User open the profile page
-Expected Outcome: Display the page which has option inlcude profile picture, username, birthday, age, email, debit.
+Test Case: The user opens the profile page
+Expected Outcome: Display the page which has options including profile picture, username, birthday, email, and debit.
 
-Test Case: User click change profile picture button
-Expected Outcome: Pop out the window to allow user to upload the image from the device.
-
-Test Case: User submit the form
-Ecpected Outcome: When everything is correct and unique, upload the information to the server. Otherwise, require user to change infomation.
+Test Case: The user submits the form
+Expected Outcome: When everything is correct and unique, upload the information to the server. Otherwise, require the user to change information.
 
 
-User Story: As a viewer, I want to be able to follow the streamer’s account and receive the notification when they start streaming. (2 point)
+3. User Story: As a user, I want to be able to donate to streamers because I want to be able to support the content creators that I am familiar with. (1 point)
 
-Test Case: Click follow streamer button
-Expected Outcome: Change button text to unfollow. And add streamer to the following list.
+Test Case: Click donate button
+Expected Outcome: Pop out the window to allow the user to top up the debit
+
+4. User Story: As a Streamer, I want to be able to see my Streamkey in settings, so I can use it to go libe.
+
 
 Test Case: Click unfollow streamer button
 Expected Outcome: Change button text to follow. And remove streamer from the following list.
 
 Test Case: Click donate button
 Expected Outcome: Donation pop up appears and prompts user to choose how much to donate and add to cart then redirects to checkout page
+
+Test Case: The streamer visits the settings page
+Expected Outcome: The streamkey is visible in settings.
+
+Test Case: The streamer uses the streamkey in OBS or similar to go live.
+Expected Outcome: There is no error shown and the stream begins.
