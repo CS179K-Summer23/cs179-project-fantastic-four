@@ -6,13 +6,10 @@ Expected Outcome: Message is showed in the streaming room.
 Test Case: User send the empty message
 Expected Outcome: Display the notification said you can't send the empty message.
 
-User Story: As a user, I want to have a profile page which I can custome my profile picture, username, etc. (2 point)
+User Story: As a user, I want to have a profile page that can customize my profile picture, username, etc. (2 point)
 
 Test Case: User open the profile page
 Expected Outcome: Display the page which has option inlcude profile picture, username, birthday, email, debit.
-
-Test Case: User click change profile picture button
-Expected Outcome: Pop out the window to allow user to upload the image from the device.
 
 Test Case: User submit the form
 Ecpected Outcome: When everything is correct and unique, upload the information to the server. Otherwise, require user to change infomation.
