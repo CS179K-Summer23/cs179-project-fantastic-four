@@ -188,7 +188,7 @@ function Settingpage(): JSX.Element {
                   <input
                     disabled
                     type="string"
-                    name="Streamkey"
+                    name="StreamURL"
                     value="rtmp://34.83.113.52/live-stream"
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border cursor-not-allowed"
