@@ -32,12 +32,14 @@ function SignIn() {
             setSubmitting(true)
             setError(null)
 
+            if (!auth) {
+              console.error('Firebase auth not available')
+              setSubmitting(false)
+              return
+            }
+
             signInWithEmailAndPassword(auth, email, password)
-              .then((userCredential) => {
-                const user = userCredential.user
-                console.log(user)
-                Redirect.push('/dashboard')
-              })
+              .then(() => Redirect.push('/'))
               .catch((error) => {
                 const errorMessage = error.message
                 setError(errorMessage)
@@ -45,7 +47,7 @@ function SignIn() {
               })
           }}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
               <div className="flex flex-col items-center">
                 {/* Insert Logo Here */}
@@ -54,7 +56,7 @@ function SignIn() {
               <Input name="email" label="Email" autoFocus />
               <Input name="password" label="Password" type="password" />
               <div className="text-center my-6">
-                <button type="submit" className="h-14 md:h-10 bg-gray-700 hover:bg-gray-800 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white w-full p-4 md:p-2 buttonFont font-bold">
+                <button type="submit" disabled={isSubmitting} className="h-14 md:h-10 bg-gray-700 hover:bg-gray-800 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white w-full p-4 md:p-2 buttonFont font-bold disabled:opacity-60">
                   Sign In
                 </button>
               </div>
