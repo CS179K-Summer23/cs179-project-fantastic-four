@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Link from "next/link";
@@ -6,6 +6,11 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { updateDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../../utils/firebase.config";
+
+function isEmailValid(email: string): boolean {
+  const pattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  return pattern.test(email);
+}
 
 function Settingpage(): JSX.Element {
   const [user, setProfile] = useState({
@@ -54,6 +59,10 @@ function Settingpage(): JSX.Element {
     }
 
     const userRef = doc(db, "users", auth.currentUser.uid);
+    if (!isEmailValid(updatedProfile.email)) {
+      alert("Please enter a valid email address");
+      return;
+    }
 
     try {
       await updateDoc(userRef, updatedProfile);
