@@ -25,3 +25,6 @@ Expected Outcome: Change button text to unfollow. And add streamer to the follow
 
 Test Case: Click unfollow streamer button
 Expected Outcome: Change button text to follow. And remove streamer from the following list.
+
+Test Case: Click donate button
+Expected Outcome: Donation pop up appears and prompts user to choose how much to donate and add to cart then redirects to checkout page
