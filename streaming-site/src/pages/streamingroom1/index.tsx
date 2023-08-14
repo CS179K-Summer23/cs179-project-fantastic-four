@@ -37,6 +37,10 @@ function StreamingRoom(): JSX.Element {
       setFollowedList([...followedList, streamer]);
     }
   };
+  
+  const [user, setUser] = useState<any>(null);
+
+ 
 
   const isFollowed = followedList.includes("StreamerUsername");
 
