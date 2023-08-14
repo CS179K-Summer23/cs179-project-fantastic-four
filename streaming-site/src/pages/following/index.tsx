@@ -1,31 +1,13 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState } from "react";
-import Navbar from "../components/navbar";
-import Footer from "../components/footer";
-import Player from "../components/player";
+import Navbar from "../../components/navbar";
+import Footer from "../../components/footer";
 
 import Link from "next/link";
 
-function Homepage(): JSX.Element {
-  const categories = ["Following", "VALORANT", "League of Legends"];
+function Followingpage(): JSX.Element {
+  const categories = ["Following"];
   const streams = [1, 2, 3];
-  const videos = [
-    "https://www.youtube.com/embed/6QnTNKOJk5A",
-    "https://www.youtube.com/embed/SqcY0GlETPk",
-    "https://www.youtube.com/embed/yEHCfRWz-EI",
-  ];
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const nextVideo = () => {
-    setCurrentIndex((prevIndex) => (prevIndex + 1) % videos.length);
-  };
-
-  const prevVideo = () => {
-    setCurrentIndex(
-      (prevIndex) => (prevIndex - 1 + videos.length) % videos.length
-    );
-  };
-
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -33,64 +15,6 @@ function Homepage(): JSX.Element {
 
       <main className="flex-1">
         <div className="container mx-auto p-8">
-          <section>
-            <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
-              <div className="relative pb-3/2 p-4">
-                <button
-                  onClick={prevVideo}
-                  className="z-10 absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15.75 19.5L8.25 12l7.5-7.5"
-                    />
-                  </svg>
-                </button>
-                <button
-                  onClick={nextVideo}
-                  className="z-10 absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg "
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke-width="1.5"
-                    stroke="currentColor"
-                    className="w-6 h-6"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                    />
-                  </svg>
-                </button>
-                <Link href="/streamingroom">
-                  <div className="relative w-full cursor-pointer">
-                    <div className="relative pb-3/2">
-                      <Player
-                        autoplay
-                        muted
-                        controls
-                        preload="auto"
-                        src={videos[currentIndex]}
-                      />
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            </div>
-          </section>
-
           {categories.map((category) => (
             <section key={category}>
               <h2 className="text-2xl font-bold my-4">{category}</h2>
@@ -175,4 +99,4 @@ function Homepage(): JSX.Element {
   );
 }
 
-export default Homepage;
+export default Followingpage;

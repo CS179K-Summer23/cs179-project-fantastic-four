@@ -10,6 +10,7 @@ function StreamingRoom(): JSX.Element {
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
   // const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [followedList, setFollowedList] = useState<string[]>([]);
 
   const formatTimestamp = (timestamp: Date) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -19,6 +20,16 @@ function StreamingRoom(): JSX.Element {
     };
     return new Intl.DateTimeFormat("en-US", options).format(timestamp);
   };
+
+  const handleFollow = () => {
+    const streamer = "StreamerUsername";
+
+    if (!followedList.includes(streamer)) {
+      setFollowedList([...followedList, streamer]);
+    }
+  };
+
+  const isFollowed = followedList.includes("StreamerUsername");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,13 +51,13 @@ function StreamingRoom(): JSX.Element {
         <div className="container mx-auto py-2 flex flex-col-reverse md:flex-row">
           <section className="w-full md:w-2/3 p-4">
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
-            <div className="relative">
+              <div className="relative">
                 <Player
                   controls
                   autoplay
                   muted
                   preload="auto"
-                  src='https://34.83.97.105/streams/obs/index.m3u8'
+                  src="https://34.83.97.105/streams/obs/index.m3u8"
                 />
               </div>
               <div className="mt-2">
@@ -58,7 +69,12 @@ function StreamingRoom(): JSX.Element {
                 <div className="flex justify-between items-center">
                   <h2 className="font-bold text-xl mb-2">Stream Title</h2>
                   <div className="text-gray-600 text-m pt-2">
-                    <button className="text-center bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
+                    <button
+                      className={`text-center ${
+                        isFollowed ? "bg-gray-600" : "bg-gray-900"
+                      } text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600`}
+                      onClick={handleFollow}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -73,7 +89,7 @@ function StreamingRoom(): JSX.Element {
                           d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                         />
                       </svg>
-                      Follow
+                      {isFollowed ? "Following" : "Follow"}
                     </button>
 
                     <button className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">

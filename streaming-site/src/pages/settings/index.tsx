@@ -8,7 +8,9 @@ function Settingpage(): JSX.Element {
     username: "",
     email: "",
     birthday: "",
+    age: "",
     name: "",
+    debit: "",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -32,14 +34,28 @@ function Settingpage(): JSX.Element {
             <h2 className="text-xl font-bold mb-4">Profile Picture</h2>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative flex items-center">
               <div className="flex items-center">
-                <img
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  className="w-20 h-20"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                {/* <img
                   src={
                     profile.profilePicture ||
                     "path/to/default/profile/picture.png"
                   }
                   alt="Profile"
                   className="w-16 h-16 rounded-full"
-                />
+                /> */}
                 <input
                   type="file"
                   name="profilePicture"
@@ -51,7 +67,9 @@ function Settingpage(): JSX.Element {
                     })
                   }
                 />
-                <button className="bg-blue-500 text-white px-4 py-2 rounded ml-4">Add Profile Picture</button>
+                <button className="bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded ml-4">
+                  Update Profile Picture
+                </button>
               </div>
             </div>
           </section>
@@ -59,9 +77,11 @@ function Settingpage(): JSX.Element {
           <section>
             <h2 className="text-xl font-bold mb-4">Profile Settings</h2>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
-              <div className="grid grid-cols-2 gap-4 w-full">
+              <div className="grid grid-rows-5 gap-4 w-full">
                 <div className="col-span-1">
-                  <label htmlFor="username" className="text-gray-700">Username</label>
+                  <label htmlFor="username" className="text-gray-700">
+                    Username
+                  </label>
                   <input
                     type="text"
                     name="username"
@@ -71,7 +91,21 @@ function Settingpage(): JSX.Element {
                   />
                 </div>
                 <div className="col-span-1">
-                  <label htmlFor="email" className="text-gray-700">Email</label>
+                  <label htmlFor="name" className="text-gray-700">
+                    Name
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={profile.name}
+                    onChange={handleChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label htmlFor="email" className="text-gray-700">
+                    Email
+                  </label>
                   <input
                     type="email"
                     name="email"
@@ -81,7 +115,9 @@ function Settingpage(): JSX.Element {
                   />
                 </div>
                 <div className="col-span-1">
-                  <label htmlFor="birthday" className="text-gray-700">Birthday</label>
+                  <label htmlFor="birthday" className="text-gray-700">
+                    Birthday
+                  </label>
                   <input
                     type="date"
                     name="birthday"
@@ -91,16 +127,34 @@ function Settingpage(): JSX.Element {
                   />
                 </div>
                 <div className="col-span-1">
-                  <label htmlFor="name" className="text-gray-700">Name</label>
+                  <label htmlFor="age" className="text-gray-700">
+                    Age
+                  </label>
                   <input
-                    type="text"
-                    name="name"
-                    value={profile.name}
+                    type="number"
+                    name="age"
+                    value={profile.age}
+                    onChange={handleChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label htmlFor="debit" className="text-gray-700">
+                    Debit
+                  </label>
+                  <input
+                    disabled
+                    type="number"
+                    name="debit"
+                    value="10000"
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border"
                   />
                 </div>
               </div>
+              <button className="float-right bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded mt-4">
+                Submit Changes
+              </button>
             </div>
           </section>
         </div>
