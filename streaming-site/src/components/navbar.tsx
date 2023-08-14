@@ -1,45 +1,44 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth"
-import { doc, getDoc } from 'firebase/firestore'
-import { getFirebaseApp } from '../utils/firebase.config'
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { getFirebaseApp } from "../utils/firebase.config";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [user, setUser] = useState<any>(null)
+  const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const { auth, db } = getFirebaseApp()
+    const { auth, db } = getFirebaseApp();
 
     if (!auth || !db) {
-      console.error('Firebase not available')
-      return
+      console.error("Firebase not available");
+      return;
     }
 
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        const { uid } = user
-        const docRef = doc(db, "users", uid)
+        const { uid } = user;
+        const docRef = doc(db, "users", uid);
 
-        getDoc(docRef).then(userData => {
+        getDoc(docRef).then((userData) => {
           if (!userData.exists()) {
-            console.error('Firebase Error: User does not exist in firestore')
-            return
+            console.error("Firebase Error: User does not exist in firestore");
+            return;
           }
 
-          setUser(userData.data() as any)
-        })
+          setUser(userData.data() as any);
+        });
+      } else {
+        console.log("No user signed in");
       }
-      else {
-        console.log('No user signed in')
-      }
-    })
-  }, [])
+    });
+  }, []);
 
   return (
     <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 py-1">
       <div className="flex items-center flex-shrink-0 text-white mr-6">
-        <Link href="/homepage" className="font-semibold text-xl tracking-tight">
+        <Link href="/" className="font-semibold text-xl tracking-tight">
           Fantastic Four
         </Link>
       </div>
@@ -58,12 +57,13 @@ function Navbar() {
         </button>
       </div>
       <div
-        className={`w-full block flex-grow lg:flex lg:items-center lg:w-auto ${isOpen ? "block" : "hidden"
-          }`}
+        className={`w-full block flex-grow lg:flex lg:items-center lg:w-auto ${
+          isOpen ? "block" : "hidden"
+        }`}
       >
         <div className="text-sm lg:flex-grow">
           <Link
-            href="/homepage"
+            href="/"
             className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
             Home
@@ -143,24 +143,22 @@ function Navbar() {
             </>
           )}
 
-          {
-            !user && (
-              <>
-                <Link
-                  href="/signin"
-                  className="inline-block text-sm p-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white lg:mt-0"
-                >
-                  Log In
-                </Link>
-                <Link
-                  href="/signup"
-                  className="inline-block text-sm ml-2 px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white lg:mt-0"
-                >
-                  Sign Up
-                </Link>
-              </>
-            )
-          }
+          {!user && (
+            <>
+              <Link
+                href="/signin"
+                className="inline-block text-sm p-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white lg:mt-0"
+              >
+                Log In
+              </Link>
+              <Link
+                href="/signup"
+                className="inline-block text-sm ml-2 px-4 py-2 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white lg:mt-0"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </nav>

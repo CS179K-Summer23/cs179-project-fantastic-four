@@ -76,17 +76,14 @@ function Homepage(): JSX.Element {
                   </svg>
                 </button>
                 <Link href="/streamingroom">
-                  <div
-                    className="relative w-full cursor-pointer"
-
-                  >
+                  <div className="relative w-full cursor-pointer">
                     <div className="relative pb-3/2">
                       <Player
                         autoplay
                         muted
                         controls
                         preload="auto"
-                        src='https://34.83.97.105/streams/obs/index.m3u8'
+                        src={videos[currentIndex]}
                       />
                     </div>
                   </div>
@@ -139,7 +136,7 @@ function Homepage(): JSX.Element {
                               left: 0,
                               width: "100%",
                               height: "100%",
-                              zIndex: 2, 
+                              zIndex: 2,
                             }}
                           ></div>
                         </div>
