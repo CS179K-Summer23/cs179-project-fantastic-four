@@ -11,6 +11,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../../utils/firebase.config";
 
 function StreamingRoom(): JSX.Element {
+  const [playerKey, setPlayerKey] = useState<number>(0);
+
   const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
     []
   );
@@ -40,15 +42,22 @@ function StreamingRoom(): JSX.Element {
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (inputRef.current && inputRef.current.value.trim() !== "") {
-      setMessages([
-        ...messages,
-        { text: inputRef.current.value.trim(), timestamp: new Date() },
-      ]);
-      inputRef.current.value = "";
+  
+    if (inputRef.current) {
+      const inputValue = inputRef.current.value.trim();
+  
+      if (inputValue === "") {
+        alert("Message cannot be empty!");
+      } else {
+        setMessages([
+          ...messages,
+          { text: inputValue, timestamp: new Date() },
+        ]);
+        inputRef.current.value = "";
+      }
     }
   };
+  
 
   const openDonationModal = () => {
     setModalIsOpen(true);
@@ -127,20 +136,10 @@ function StreamingRoom(): JSX.Element {
                       onClick={openDonationModal} // Open the modal on click
                       className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6 inline-block mr-1"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
-                        />
-                      </svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 inline-block mr-1">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>
+
                       Donate
                     </button>
 

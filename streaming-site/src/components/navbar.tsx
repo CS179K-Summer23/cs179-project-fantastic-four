@@ -3,6 +3,8 @@ import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../utils/firebase.config";
+import { signOut } from "firebase/auth";
+
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -34,6 +36,8 @@ function Navbar() {
       }
     });
   }, []);
+
+  
 
   return (
     <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 py-1">
