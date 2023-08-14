@@ -65,13 +65,49 @@ function Homepage(): JSX.Element {
             <section>
               <h2 className="text-xl font-bold my-4">Profile Settings</h2>
                 <div className="flex rounded overflow-hidden shadow-lg p-4 bg-white relative">
-                  <div className="grid grid-rows-3 grid-flow-col">
-                    <div className="col-span-2">02</div>
-                    <div className="col-span-2">01</div>
-
-
-                  </div>
+                  <div className="divide-y divide-slate-200">
+                    <div className="flex">
+                      username
+                      <form className="text-sm ml-10">
+                        <input
+                          className="bg-grey-lighter rounded pl-1 w-full"
+                          type="text  "
+                          placeholder="username"
+                        />
+                      </form>  
+                    </div>
+                    <div className="flex">
+                      birthday
+                      <form className="text-sm ml-10">
+                        <input
+                          className="bg-grey-lighter rounded pl-1 w-full"
+                          type="text  "
+                          placeholder="username"
+                        />
+                      </form>  
+                    </div>
+                    <div className="flex">
+                      age
+                      <form className="text-sm ml-10">
+                        <input
+                          className="bg-grey-lighter rounded pl-1 w-full"
+                          type="text  "
+                          placeholder="username"
+                        />
+                      </form>  
+                    </div>
+                    <div className="flex">
+                      email
+                      <form className="text-sm ml-10">
+                        <input
+                          className="bg-grey-lighter rounded pl-1 w-full"
+                          type="text  "
+                          placeholder="username"
+                        />
+                      </form>  
+                    </div>
                 </div>
+              </div>
             </section>
           </div>
       </main>
