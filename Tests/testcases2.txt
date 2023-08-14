@@ -19,3 +19,11 @@ Expected Outcome: When everything is correct and unique, upload the information 
 
 Test Case: Click donate button
 Expected Outcome: Pop out the window to allow the user to top up the debit
+
+4. User Story: As a Streamer, I want to be able to see my Streamkey in settings, so I can use it to go libe.
+
+Test Case: The streamer visits the settings page
+Expected Outcome: The streamkey is visible in settings.
+
+Test Case: The streamer uses the streamkey in OBS or similar to go live.
+Expected Outcome: There is no error shown and the stream begins.
