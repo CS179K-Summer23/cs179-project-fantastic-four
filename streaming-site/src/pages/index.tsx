@@ -26,7 +26,6 @@ function Homepage(): JSX.Element {
     );
   };
 
-
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
@@ -36,9 +35,23 @@ function Homepage(): JSX.Element {
           <section>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
               <div className="relative pb-3/2 p-4">
+                <Link href="/streamingroom">
+                  <div className="relative w-full cursor-pointer">
+                    <div className="relative pb-3/2">
+                      <Player
+                        autoplay
+                        muted
+                        controls
+                        preload="auto"
+                        src={videos[currentIndex]}
+                        clasName="z-8"
+                      />
+                    </div>
+                  </div>
+                </Link>
                 <button
                   onClick={prevVideo}
-                  className="z-10 absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg"
+                  className="z-9 absolute top-1/2 left-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +70,7 @@ function Homepage(): JSX.Element {
                 </button>
                 <button
                   onClick={nextVideo}
-                  className="z-10 absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg "
+                  className="z-9 absolute top-1/2 right-0 transform -translate-y-1/2 p-2 bg-gray-300 hover:bg-gray-400 rounded-lg "
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -74,19 +87,6 @@ function Homepage(): JSX.Element {
                     />
                   </svg>
                 </button>
-                <Link href="/streamingroom">
-                  <div className="relative w-full cursor-pointer">
-                    <div className="relative pb-3/2">
-                      <Player
-                        autoplay
-                        muted
-                        controls
-                        preload="auto"
-                        src={videos[currentIndex]}
-                      />
-                    </div>
-                  </div>
-                </Link>
               </div>
             </div>
           </section>
@@ -116,14 +116,7 @@ function Homepage(): JSX.Element {
                         >
                           <iframe
                             src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/A_black_image.jpg/1280px-A_black_image.jpg"
-                            style={{
-                              position: "absolute",
-                              top: 0,
-                              left: 0,
-                              width: "100%",
-                              height: "100%",
-                              zIndex: 1,
-                            }}
+                            className="absolute top-0 left-0 w-full h-full z-8"
                             frameBorder="0"
                             scrolling="no"
                             allowFullScreen={true}

@@ -4,8 +4,8 @@ import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Player from "../../components/player";
 import Link from "next/link";
-import Modal from 'react-modal';
-import DonationForm from '../../components/donation-form'; 
+import Modal from "react-modal";
+import DonationForm from "../../components/donation-form";
 
 function StreamingRoom(): JSX.Element {
   const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
@@ -145,20 +145,18 @@ function StreamingRoom(): JSX.Element {
                       contentLabel="Donation Modal"
                       style={{
                         overlay: {
-                          backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
                         },
                         content: {
-                          maxWidth: '800px', 
-                          maxHeight: '600px',
-                          margin: '0 auto',
-                          padding: '30px',
+                          maxWidth: "800px",
+                          maxHeight: "600px",
+                          margin: "0 auto",
+                          padding: "30px",
                         },
                       }}
                     >
                       <DonationForm onClose={() => setModalIsOpen(false)} />
-                  </Modal>
-
-
+                    </Modal>
                   </div>
                 </div>
 

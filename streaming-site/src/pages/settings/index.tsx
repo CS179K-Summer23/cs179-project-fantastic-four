@@ -1,22 +1,74 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
+import Link from "next/link";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { updateDoc } from "firebase/firestore";
+import { getFirebaseApp } from "../../utils/firebase.config";
 
 function Settingpage(): JSX.Element {
-  const [profile, setProfile] = useState({
-    profilePicture: "",
-    username: "",
-    email: "",
-    birthday: "",
-    age: "",
+  const [user, setProfile] = useState({
     name: "",
-    debit: "",
+    profilePicture: "",
+    email: "",
+    birthday: 0,
+    age: 0,
+    debit: 0,
   });
+
+  useEffect(() => {
+    const { auth, db } = getFirebaseApp();
+
+    if (!auth || !db) {
+      console.error("Firebase not available");
+      return;
+    }
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        const { uid } = user;
+        const docRef = doc(db, "users", uid);
+
+        getDoc(docRef).then((userData) => {
+          if (!userData.exists()) {
+            console.error("Firebase Error: User does not exist in firestore");
+            return;
+          }
+
+          setProfile(userData.data() as typeof user);
+        });
+      } else {
+        console.log("No user signed in");
+      }
+    });
+  }, []);
+
+  //upload profile to firebase
+  const updateUserProfile = async (updatedProfile: typeof user) => {
+    const { auth, db } = getFirebaseApp();
+
+    if (!auth || !db || !auth.currentUser) {
+      console.error("Firebase not available or user not signed in");
+      return;
+    }
+
+    const userRef = doc(db, "users", auth.currentUser.uid);
+
+    try {
+      await updateDoc(userRef, updatedProfile);
+      console.log("Profile updated successfully");
+      alert("Profile updated successfully!"); // Displaying an alert
+    } catch (error) {
+      console.error("Failed to update profile", error);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setProfile({
-      ...profile,
+      ...user,
       [name]: value,
     });
   };
@@ -56,17 +108,7 @@ function Settingpage(): JSX.Element {
                   alt="Profile"
                   className="w-16 h-16 rounded-full"
                 /> */}
-                <input
-                  type="file"
-                  name="profilePicture"
-                  className="ml-4"
-                  onChange={(e) =>
-                    setProfile({
-                      ...profile,
-                      profilePicture: URL.createObjectURL(e.target.files?.[0]),
-                    })
-                  }
-                />
+                <input type="file" name="profilePicture" className="ml-4" />
                 <button className="bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded ml-4">
                   Update Profile Picture
                 </button>
@@ -77,19 +119,7 @@ function Settingpage(): JSX.Element {
           <section>
             <h2 className="text-xl font-bold mb-4">Profile Settings</h2>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
-              <div className="grid grid-rows-5 gap-4 w-full">
-                <div className="col-span-1">
-                  <label htmlFor="username" className="text-gray-700">
-                    Username
-                  </label>
-                  <input
-                    type="text"
-                    name="username"
-                    value={profile.username}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 rounded border"
-                  />
-                </div>
+              <div className="grid grid-rows-4 gap-4 w-full">
                 <div className="col-span-1">
                   <label htmlFor="name" className="text-gray-700">
                     Name
@@ -97,7 +127,7 @@ function Settingpage(): JSX.Element {
                   <input
                     type="text"
                     name="name"
-                    value={profile.name}
+                    value={user?.name}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border"
                   />
@@ -109,7 +139,7 @@ function Settingpage(): JSX.Element {
                   <input
                     type="email"
                     name="email"
-                    value={profile.email}
+                    value={user?.email}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border"
                   />
@@ -121,19 +151,7 @@ function Settingpage(): JSX.Element {
                   <input
                     type="date"
                     name="birthday"
-                    value={profile.birthday}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 rounded border"
-                  />
-                </div>
-                <div className="col-span-1">
-                  <label htmlFor="age" className="text-gray-700">
-                    Age
-                  </label>
-                  <input
-                    type="number"
-                    name="age"
-                    value={profile.age}
+                    value={user?.birthday}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border"
                   />
@@ -146,13 +164,15 @@ function Settingpage(): JSX.Element {
                     disabled
                     type="number"
                     name="debit"
-                    value="10000"
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 rounded border"
+                    value={user?.debit}
+                    className="w-full p-2 mt-1 rounded border cursor-not-allowed"
                   />
                 </div>
               </div>
-              <button className="float-right bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded mt-4">
+              <button
+                onClick={() => updateUserProfile(user)}
+                className="float-right bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded mt-4"
+              >
                 Submit Changes
               </button>
             </div>
