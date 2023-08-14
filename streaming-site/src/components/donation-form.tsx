@@ -6,7 +6,6 @@ interface DonationFormProps {
     onClose: () => void; 
 }
 
-
 const DonationForm: React.FC<DonationFormProps> = ({ onClose }) => {
     const [donationAmount, setDonationAmount] = useState(0);
     const [cartAmount, setCartAmount] = useState(0);
@@ -22,8 +21,8 @@ const DonationForm: React.FC<DonationFormProps> = ({ onClose }) => {
     };
 
     const handleCheckoutClick = () => {
-        console.log('fetching')
-        fetch('/create-checkout-session', {
+        // console.log('fetching')
+        fetch('http://localhost:3000/create-checkout-session', {
             method: 'POST', 
             headers: {
             'Content-Type': 'application/json', 
@@ -39,7 +38,8 @@ const DonationForm: React.FC<DonationFormProps> = ({ onClose }) => {
         if(res.ok) return res.json()
         return res.json().then(json => Promise.reject(json))
         }).then(( { url }) => {
-        window.location 
+        // window.location 
+        console.log(url)
     }).catch(e => {
         console.error(e.error)
     })
