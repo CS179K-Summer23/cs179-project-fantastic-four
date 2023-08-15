@@ -1,15 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Redirect from 'next/router'
 import Link from 'next/link'
 import { Formik, Form } from 'formik'
 import { object, string } from 'yup'
 import { createUserWithEmailAndPassword } from "firebase/auth"
+import { setDoc, doc } from 'firebase/firestore'
 import Input from '../../components/input'
 import { getFirebaseApp } from '../../utils/firebase.config'
 
 function Signup() {
   const [errorMessage, setErrorMessage] = useState('')
-  const { auth } = getFirebaseApp()
+  const { auth, db } = getFirebaseApp()
 
   return (
     <div className="flex justify-center items-center m-6 md:m-0 flex-col h-full">
@@ -25,12 +26,20 @@ function Signup() {
             setSubmitting(true)
             setErrorMessage('')
 
+            if (!auth) {
+              console.error('Firebase auth not available')
+              setSubmitting(false)
+              return
+            }
+
             createUserWithEmailAndPassword(auth, email, password)
               .then((userCredential) => {
                 const user = userCredential.user
-                console.log(user)
-                Redirect.push('/dashboard')
+                return setDoc(doc(db, "users", user.uid), {
+                  name,
+                })
               })
+              .then(() => Redirect.push('/'))
               .catch((error) => {
                 const errorMessage = error.message
                 setErrorMessage(errorMessage)
@@ -38,7 +47,7 @@ function Signup() {
               })
           }}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, isSubmitting }) => (
             <Form onSubmit={handleSubmit}>
               <div className="flex flex-col items-center">
                 {/* Insert Logo Here */}
@@ -48,7 +57,7 @@ function Signup() {
               <Input name="email" label="Email" />
               <Input name="password" label="Password" type="password" />
               <div className="text-center my-6">
-                <button type="submit" className="h-14 md:h-10 bg-gray-700 hover:bg-gray-800 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white w-full p-4 md:p-2">
+                <button type="submit" disabled={isSubmitting} className="h-14 md:h-10 bg-gray-700 hover:bg-gray-800 dark:bg-indigo-700 dark:hover:bg-indigo-800 text-white w-full p-4 md:p-2 disabled:opacity-60">
                   Sign Up
                 </button>
               </div>

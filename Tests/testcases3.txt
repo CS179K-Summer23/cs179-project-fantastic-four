@@ -1,0 +1,23 @@
+1. User Story: As a user, I want to be able to donate to streamers because I want to be able to support the content creators that I am familiar with. (1 point)
+
+Test Case: Click the checkout button
+Expect Outcome: The new window pops out with a stripe payment link
+
+Test Case: Finish the payment
+Expect Outcome: If everything is correct, top up the money to the account. Otherwise, show the payment failed.
+
+2. User Story: As a viewer, I want to be able to follow the streamer’s account and receive the notification when they start streaming. (2 point)
+
+Test Case: Click follow streamer button
+Expected Outcome: Change button text to unfollow. And add the streamer to the following list.
+
+Test Case: Click unfollow streamer button
+Expected Outcome: Change button text to follow. And remove the streamer from the following list.
+
+3. User Story: As a streamer, I want to be able to see how many viewers in my streaming room
+
+Test Case: When a viewer joins the streaming room
+Expected Outcome: The viewer count is adding one.
+
+Test Case: When a viewer leaves the streaming room
+Expected Outcome: The viewer count is minus one.

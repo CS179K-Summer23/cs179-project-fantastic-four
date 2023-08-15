@@ -4,16 +4,22 @@ import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Player from "../../components/player";
 import Link from "next/link";
-import Modal from 'react-modal';
-import DonationForm from '../../components/donation-form'; 
+import Modal from "react-modal";
+import DonationForm from "../../components/donation-form";
+import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
+import { getFirebaseApp } from "../../utils/firebase.config";
 
 function StreamingRoom(): JSX.Element {
+  const [playerKey, setPlayerKey] = useState<number>(0);
+
   const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
     []
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   // const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [followedList, setFollowedList] = useState<string[]>([]);
 
   const formatTimestamp = (timestamp: Date) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -24,22 +30,45 @@ function StreamingRoom(): JSX.Element {
     return new Intl.DateTimeFormat("en-US", options).format(timestamp);
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleFollow = () => {
+    const streamer = "StreamerUsername";
 
-    if (inputRef.current && inputRef.current.value.trim() !== "") {
-      setMessages([
-        ...messages,
-        { text: inputRef.current.value.trim(), timestamp: new Date() },
-      ]);
-      inputRef.current.value = "";
+    if (!followedList.includes(streamer)) {
+      setFollowedList([...followedList, streamer]);
     }
   };
+  
+  const [user, setUser] = useState<any>(null);
+
+
+
+  const isFollowed = followedList.includes("StreamerUsername");
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+  
+    if (inputRef.current) {
+      const inputValue = inputRef.current.value.trim();
+  
+      if (inputValue === "") {
+        alert("Message cannot be empty!");
+      } else {
+        setMessages([
+          ...messages,
+          { text: inputValue, timestamp: new Date() },
+        ]);
+        inputRef.current.value = "";
+      }
+    }
+  };
+  
 
   const openDonationModal = () => {
     setModalIsOpen(true);
   };
 
+
+ 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
@@ -48,13 +77,13 @@ function StreamingRoom(): JSX.Element {
         <div className="container mx-auto py-2 flex flex-col-reverse md:flex-row">
           <section className="w-full md:w-2/3 p-4">
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
-            <div className="relative">
+              <div className="relative">
                 <Player
                   controls
                   autoplay
                   muted
                   preload="auto"
-                  src='https://34.83.97.105/streams/obs/index.m3u8'
+                  src="https://34.83.97.105/streams/obs/index.m3u8"
                 />
               </div>
               <div className="mt-2">
@@ -66,7 +95,12 @@ function StreamingRoom(): JSX.Element {
                 <div className="flex justify-between items-center">
                   <h2 className="font-bold text-xl mb-2">Stream Title</h2>
                   <div className="text-gray-600 text-m pt-2">
-                    <button className="text-center bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
+                    <button
+                      className={`text-center ${
+                        isFollowed ? "bg-gray-600" : "bg-gray-900"
+                      } text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600`}
+                      onClick={handleFollow}
+                    >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -81,7 +115,7 @@ function StreamingRoom(): JSX.Element {
                           d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                         />
                       </svg>
-                      Follow
+                      {isFollowed ? "Following" : "Follow"}
                     </button>
 
                     <button className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
@@ -106,20 +140,10 @@ function StreamingRoom(): JSX.Element {
                       onClick={openDonationModal} // Open the modal on click
                       className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke-width="1.5"
-                        stroke="currentColor"
-                        className="w-6 h-6 inline-block mr-1"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
-                        />
-                      </svg>
+                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 inline-block mr-1">
+  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+</svg>
+
                       Donate
                     </button>
 
@@ -129,20 +153,18 @@ function StreamingRoom(): JSX.Element {
                       contentLabel="Donation Modal"
                       style={{
                         overlay: {
-                          backgroundColor: 'rgba(0, 0, 0, 0.5)', 
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
                         },
                         content: {
-                          maxWidth: '800px', 
-                          maxHeight: '600px',
-                          margin: '0 auto',
-                          padding: '30px',
+                          maxWidth: "800px",
+                          maxHeight: "600px",
+                          margin: "0 auto",
+                          padding: "30px",
                         },
                       }}
                     >
                       <DonationForm onClose={() => setModalIsOpen(false)} />
-                  </Modal>
-
-
+                    </Modal>
                   </div>
                 </div>
 
@@ -184,7 +206,7 @@ function StreamingRoom(): JSX.Element {
                 {messages.map((message, index) => (
                   <div key={index} className="mb-2">
                     <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">User123</span>
+                      <span className="text-gray-600 text-sm">test</span>
                       <span className="text-gray-400 text-xs">
                         {formatTimestamp(message.timestamp)}
                       </span>

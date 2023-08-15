@@ -37,6 +37,7 @@ const Player = (props: PlayerProps) => {
         <div data-vjs-player>
           <video ref={onPlayer} className="video-js vjs-16-9" playsInline />
         </div>
+        
     )
   }
 
