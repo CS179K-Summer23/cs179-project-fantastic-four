@@ -21,6 +21,7 @@ function Settingpage(): JSX.Element {
     age: 0,
     debit: 0,
     stream_key: "",
+    title: "",
   });
 
   useEffect(() => {
@@ -167,17 +168,17 @@ function Settingpage(): JSX.Element {
                   />
                 </div>
 
+
                 <div className="col-span-1">
-                  <label htmlFor="Streamkey" className="text-gray-700">
-                    Streamkey
+                  <label htmlFor="Title" className="text-gray-700">
+                    Title
                   </label>
                   <input
-                    disabled
-                    type="string"
-                    name="Streamkey"
-                    value={user?.stream_key}
+                    type="text"
+                    name="title"
+                    value={user?.title}
                     onChange={handleChange}
-                    className="w-full p-2 mt-1 rounded border cursor-not-allowed"
+                    className="w-full p-2 mt-1 rounded border"
                   />
                 </div>
 
@@ -190,6 +191,20 @@ function Settingpage(): JSX.Element {
                     type="string"
                     name="StreamURL"
                     value="rtmp://34.83.113.52/live-stream"
+                    onChange={handleChange}
+                    className="w-full p-2 mt-1 rounded border cursor-not-allowed"
+                  />
+                </div>
+
+                <div className="col-span-1">
+                  <label htmlFor="Streamkey" className="text-gray-700">
+                    Streamkey
+                  </label>
+                  <input
+                    disabled
+                    type="string"
+                    name="Streamkey"
+                    value={user?.stream_key}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border cursor-not-allowed"
                   />
