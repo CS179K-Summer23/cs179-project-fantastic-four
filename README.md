@@ -8,9 +8,9 @@ A live-streaming web application similar to Twitch. Users will be able to sign u
 # Team Members
 
 Jaired Jawed - JaireddJawed  
-Aryan Obrai - Aryan-Obrai     
 Pallav Datusalia - notpallav  
-Zhenjie Liu - 2314577483  
+Aryan Obrai - Aryan-Obrai    
+Zhenjie Liu - 2314577483 
 
 # Technologies 
 

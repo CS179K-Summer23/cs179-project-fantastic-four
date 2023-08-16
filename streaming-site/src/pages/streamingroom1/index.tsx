@@ -40,8 +40,6 @@ function StreamingRoom(): JSX.Element {
   
   const [user, setUser] = useState<any>(null);
 
-
-
   const isFollowed = followedList.includes("StreamerUsername");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
