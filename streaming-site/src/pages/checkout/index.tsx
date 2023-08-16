@@ -1,6 +1,6 @@
 // components/CheckoutForm.js
 import React, { useEffect, useState } from 'react';
-import { PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { PaymentElement, useStripe, useElements, CardElement } from '@stripe/react-stripe-js';
 
 const CheckoutForm = () => {
   const stripe = useStripe();
@@ -19,23 +19,30 @@ const CheckoutForm = () => {
 
   const handleSubmit = async (event: { preventDefault: () => void; }) => {
     event.preventDefault();
-    
+  
     if (!stripe || !elements) {
       return;
     }
-    
+  
+    const cardElement = elements.getElement('card'); 
+    if (!cardElement || !(cardElement instanceof CardElement)) {
+      console.error('Invalid card element');
+      return;
+    }
+  
     const result = await stripe.confirmCardPayment(clientSecret, {
       payment_method: {
-        card: elements.getElement(PaymentElement),
+        card: cardElement,
       },
     });
-    
+  
     if (result.error) {
       console.error(result.error.message);
     } else {
+      // Handle successful payment
     }
   };
-
+  
   return (
     <form onSubmit={handleSubmit}>
       <PaymentElement />
