@@ -14,8 +14,6 @@ function Chat({ streamId }: { streamId: string }) {
   const [user, setUser] = useState<any>(null)
   const [messages, setMessages] = useState<any>([])
 
-  console.log(messages)
-
   useEffect(() => {
     const { db, auth } = getFirebaseApp()
 
@@ -29,7 +27,7 @@ function Chat({ streamId }: { streamId: string }) {
 
         return {
           text: chatMessage.data().text,
-          username: userSnap?.data()?.username || 'Anonymous',
+          username: userSnap?.data()?.name || 'Anonymous',
           timestamp: chatMessage.data().timestamp,
           streamId: chatMessage.data().streamId,
         } as unknown as Message
@@ -98,8 +96,6 @@ function Chat({ streamId }: { streamId: string }) {
         const message = messageInput.value.trim()
 
         if (message === "") return
-
-        console.log(streamId)
 
         await addDoc(collection(db, 'chat'), {
           text: message,
