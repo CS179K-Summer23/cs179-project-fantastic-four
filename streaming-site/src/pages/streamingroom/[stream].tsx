@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Player from "../../components/player";
+import Chat from '../../components/chat';
 import { getFirebaseApp } from '../../utils/firebase.config'
 
 function StreamingRoom(): JSX.Element {
@@ -137,6 +138,7 @@ function StreamingRoom(): JSX.Element {
             </div>
           </section>
 
+          <Chat streamId="streamingroom1" />
         </div>
       </div>
 
