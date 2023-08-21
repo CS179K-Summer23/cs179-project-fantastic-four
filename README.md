@@ -40,7 +40,7 @@ As a streamer, I want to be able to stream my games or videos so that my communi
 
 As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
 
-As a viewer, I want to be able to follow the streamer’s account and receive the notification when they start streaming. (2 point)
+As a viewer, I want to be able to follow the streamer’s account and receive a notification when they start streaming. (2 point)
 
 As a user, I want to be able to login so that I can keep track of the streamers that I watch seamlessly and be able to easily talk to others in chat. (2 points)
 
@@ -51,4 +51,7 @@ As a streamer, I want to check the chat history when I was streaming. So I can i
 As a user, I want to be able to add information to my profile because I want to be able to personalize my profile. (1 point)
 
 As a user, I want to be able to donate to streamers because I want to be able to support the content creators that I am familiar with. (1 point)
+
+As a user, I want to check my donation history so I can check which streamer I have donated. (1 point)
+
 
