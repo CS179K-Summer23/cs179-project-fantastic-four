@@ -16,7 +16,6 @@ const endpoint = async (req: NextApiRequest, res: NextApiResponse) => {
       from: 'mail@fantasticfourstreaming.herokuapp.com',
       subject: 'Streamer ' + req.body.streamer.name + ' is live!',
       text: 'A streamer from our site is named ' + req.body.streamer.name + ' is live! Come check them out!',
-      html: '<strong>New episode of Fantastic Four</strong>',
     }
 
     console.log(msg)
