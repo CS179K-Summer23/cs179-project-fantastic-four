@@ -6,6 +6,9 @@ Expect Outcome: The new window pops out with a stripe payment link
 Test Case: Finish the payment
 Expect Outcome: If everything is correct, top up the money to the account. Otherwise, show the payment failed.
 
+Test Case: Check the debit after finish payment
+Expect Outcome: The amount of debit is changed.
+
 2. User Story: As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
 
 Test Case: The user send the valid message
@@ -14,10 +17,10 @@ Expected Outcome: The message is shown in the streaming room.
 Test Case: The user send the empty message
 Expected Outcome: Display the notification said you can't send the empty message.
 
-3. User Story: As a streamer, I want to be able to see how many viewers in my streaming room
+Test Case: The user joins the streaming room late
+Expected Outcome: The user still can see the chat history.
 
-Test Case: When a viewer joins the streaming room
-Expected Outcome: The viewer count is adding one.
+Test Case: The streamer deletes the message.
+Expected Outcome: The message  is disappeared. 
 
-Test Case: When a viewer leaves the streaming room
-Expected Outcome: The viewer count is minus one.
+
