@@ -22,6 +22,7 @@ function Settingpage(): JSX.Element {
     debit: 0,
     stream_key: "",
     title: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -177,6 +178,19 @@ function Settingpage(): JSX.Element {
                     type="text"
                     name="title"
                     value={user?.title}
+                    onChange={handleChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+
+                <div className="col-span-1">
+                  <label htmlFor="Description" className="text-gray-700">
+                    Description
+                  </label>
+                  <input
+                    type="text"
+                    name="description"
+                    value={user?.description}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border"
                   />
