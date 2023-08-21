@@ -96,10 +96,10 @@ function Chat({ streamId }: { streamId: string }) {
   }
 
   const { db } = getFirebaseApp()
-  const isStreamer = getDoc(doc(db, 'streams', streamId)).then((stream) => {
-    if (!user) return false
-    return stream.data()?.streamer_id === user.uid
-  })
+  // const isStreamer = getDoc(doc(db, 'streams', streamId)).then((stream) => {
+  //   if (!user) return false
+  //   return stream.data()?.streamer_id === user.uid
+  // })
 
   return (
     <section
