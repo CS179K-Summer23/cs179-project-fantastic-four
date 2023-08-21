@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/router'
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, query, collection, where, onSnapshot } from "firebase/firestore";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Player from "../../components/player";
@@ -13,22 +13,44 @@ function StreamingRoom(): JSX.Element {
   );
 
   const [streamLoading, setStreamLoading] = useState<boolean>(true)
+  const [streamerLoading, setStreamerLoading] = useState<boolean>(true)
   const [stream, setStream] = useState<any>(null)
+  const [streamer, setStreamer] = useState<any>(null)
   const router = useRouter()
 
   useEffect(() => {
     (async function() {
       const { db } = getFirebaseApp()
       if (!db) return
+      
+      const queryUser = router.query.stream;
+      if (!queryUser) return;
+      console.log('a', queryUser);
+      const streamerQuery = query(
+        collection(db, "users"), 
+        where("name", "==", queryUser)
+        );      
+        const streamerSnapshot = await getDocs(streamerQuery);
+        if (streamerSnapshot.empty) {setStreamerLoading(false); return; }
+        
+        const streamerData = streamerSnapshot.docs[0].data();
+        setStreamer(streamerData)
+        setStreamerLoading(false)
+        
+        if (!(streamerData['stream_id'])) {setStreamLoading(false); return; }
 
-      const streamRef = doc(db, 'streams', router.query.stream as string)
-      const streamSnap = await getDoc(streamRef)
+        const streamRef = doc(db, 'streams', streamerData['stream_id']);
+        // const unsubStream = onSnapshot(streamRef, async (doc) => {
+          const streamSnap = await getDoc(streamRef)
+          if (streamSnap.exists()) {
+            setStream(streamSnap.data())
+          }
+        // })
+        setStreamLoading(false)
 
-      setStreamLoading(false)
-      if (streamSnap.exists()) {
-        console.log("Document data:", streamSnap.data())
-        setStream(streamSnap.data())
-      }
+      return () => {
+      };
+
     }())
   }, [router])
 
@@ -40,7 +62,7 @@ function StreamingRoom(): JSX.Element {
         <div className="container mx-auto py-2 flex flex-col-reverse md:flex-row">
           <section className="w-full md:w-2/3 p-4">
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
-            <div className="relative">
+            <div className="relative aspect-video" >
                 {stream !== null && !streamLoading &&
                 (<Player
                   controls
@@ -49,17 +71,24 @@ function StreamingRoom(): JSX.Element {
                   preload="auto"
                   src={stream?.stream_url}
                 />)}
-                {
-                  streamLoading && (
+                {/* {
+                  streamer && streamLoading == false && (
                     <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
-                      <p className="text-white text-2xl">Loading...</p>
+                      <p className="text-black text-2xl">Loading...</p>
+                    </div>
+                  )
+                } */}
+                {
+                  !streamerLoading && !streamer && (
+                    <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+                      <p className="text-black text-2xl">No streamer with this name exists</p>
                     </div>
                   )
                 }
                 {
-                  stream === null && !streamLoading && (
+                  streamer && !streamLoading && !stream &&  (
                     <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
-                      <p className="text-white text-2xl">No stream found</p>
+                      <p className="text-black text-2xl">{streamer?.name} is not currently live</p>
                     </div>
                   )
                 }
@@ -71,7 +100,7 @@ function StreamingRoom(): JSX.Element {
                   alt="Streamer avatar"
                 />
                 <div className="flex justify-between items-center">
-                  <h2 className="font-bold text-xl mb-2">Stream Title</h2>
+                  <h2 className="font-bold text-xl mb-2">{stream?.title || streamer?.title}</h2>
                   <div className="text-gray-600 text-m pt-2">
                     <button className="text-center bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
                       <svg
@@ -113,7 +142,7 @@ function StreamingRoom(): JSX.Element {
 
                 <div className="flex justify-between items-center pl-9">
                   <p className="text-gray-700 text-base">
-                    Stream description here...
+                    {streamer?.name}
                   </p>
                   <span className="flex text-gray-600 text-m pr-6 pt-2">
                     <svg
@@ -130,7 +159,7 @@ function StreamingRoom(): JSX.Element {
                         d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
                       />
                     </svg>
-                    123
+                    {stream?.view_count}
                   </span>
                 </div>
               </div>
