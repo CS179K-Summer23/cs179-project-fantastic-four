@@ -7,7 +7,7 @@ import { string, bool, number } from 'prop-types';
 
 import Link from "next/link";
 
-import { QuerySnapshot, collection, doc, getDocs, getDoc, query, where } from "firebase/firestore";
+import { QuerySnapshot, collection, doc, getDocs, getDoc, query, where, orderBy } from "firebase/firestore";
 import { getFirebaseApp } from "../../utils/firebase.config";
 
 
@@ -18,13 +18,22 @@ function Streams(): JSX.Element {
     title: string;
     stream_url: string;
     thumbnail_url: string;
+    description: string;
     category: string;
     streamer_id: number;
     view_count: number;
     start_time: number;
     end_time: number;
   }
+
+  interface Streamer {
+    id: string;
+    name: string;
+    avatar_url: string;
+  }
+  
   const [streams, setStreams] = useState<Stream[]>([]);
+  const [streamers, setStreamers] = useState<Streamer[]>([]);
 
 
 
@@ -37,25 +46,57 @@ function Streams(): JSX.Element {
       return;
     }
 
+    const usersRef = collection(db, "users");
+
+    const fetchStreamer = async (streamer_id: string) => {
+      const streamerQuery = query(
+        usersRef, 
+        where("id", "==", streamer_id)
+      );
+
+      const userSnapshot = await getDocs(streamerQuery);
+      return userSnapshot.docs[0].data();
+      };
+    
     const fetchStreams = async () => {
-      const streamsCollRef = collection(db, "streams");
-      const usersCollRef = collection(db, "users");
+      const streamsQuery = query(
+        collection(db, 'streams'),
+        orderBy('view_count')
+      ); 
+      const streamsSnapshot = await getDocs(streamsQuery);
 
-      const querySnapshot = await getDocs(streamsCollRef);
+      const streamsArr: any[] = await Promise.all(streamsSnapshot.docs
+          .filter((stream) => stream.data()['end_time'] === null)
+          .map( async (stream) => {   
+                      return stream.data();
+      }));
 
-      if (querySnapshot.empty) {
-        console.error("Firebase Error: Streams Collection is empty or does not exist in firestore");
-        return;
-      }
-      querySnapshot.forEach((doc) => {
-        if (doc.data()['end_time']) return;
-        const q = query(usersCollRef, where("id", "==", doc.data()['streamer_id']));
-        setStreams([...streams, Object.assign( {}, doc.data())] as typeof streams);
-      });
+      const streamersArr: any[] = await Promise.all(streamsArr
+        .map( async(stream) => {
+          return await fetchStreamer(stream['streamer_id'])
+            .then(async (data) => {
+              console.log('data', data);
+              return data;
+          });
+      }));
 
-    }
+      console.log('a', streamsArr);
+      console.log('b', streamersArr);
+      return [streamsArr, streamersArr];
+    };
 
-    fetchStreams().catch(console.error)
+    fetchStreams().then(async (data: any[]) => {
+      console.log('then', data);
+      if (data[0]) setStreams(data[0]);
+      if (data[1]) setStreamers(data[1]);
+
+      console.log(streams);
+      console.log(streamers);
+
+    }).catch(error => {
+      console.log(error);
+    })
+    
   }, []);
 
   return (
@@ -64,14 +105,14 @@ function Streams(): JSX.Element {
       <main className="flex-1">
         <div className="container mx-auto p-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                {streams.map((stream) => (
+                {streams.map((stream, i) => (
                   <div
                     key={stream.id}
                     className="rounded overflow-hidden shadow-lg p-4 bg-white"
                   >
                     <div className="relative pb-3/2">
                       <Player
-                          autoplay
+                        autoplay
                           muted
                           preload="auto"
                           src={stream.stream_url}
@@ -80,7 +121,7 @@ function Streams(): JSX.Element {
                     </div>
 
                     <div className="">
-                      <Link href="/streamingroom1">
+                      <Link href={'/streamingroom/' + streamers[i].name}>
                         <div
                           className="relative"
                         >
@@ -112,15 +153,15 @@ function Streams(): JSX.Element {
                         />
                         <div className="pl-9">
                           <h3 className="font-bold text-xl hover:text-gray-500">
-                            <Link href="/streamingroom">
+                            <Link href={'/streamingroom/' + streamers[i].name}>
                               {stream.title}
                             </Link>
                           </h3>
                           <Link
-                            href="/streamingroom"
+                            href={'/streamingroom/' + streamers[i].name}
                             className="text-sm text-gray-700 hover:text-gray-500"
                           >
-                            Stream description here...
+                            {streamers[i].name}
                           </Link>
                         </div>
                       </div>
