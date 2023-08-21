@@ -14,7 +14,7 @@ function Navbar() {
     const { auth, db } = getFirebaseApp();
 
     if (!auth || !db) {
-      console.error("Firebase not available");
+      console.error("Firebase error: Firebase not available");
       return;
     }
 
@@ -31,13 +31,9 @@ function Navbar() {
 
           setUser(userData.data() as any);
         });
-      } else {
-        console.log("No user signed in");
       }
     });
   }, []);
-
-  
 
   return (
     <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 py-1">
@@ -171,7 +167,23 @@ function Navbar() {
                       >
                         Settings
                       </Link>
-                      <button className="text-gray-700 block px-4 py-2 text-sm">
+                      <button
+                        className="text-gray-700 block px-4 py-2 text-sm"
+                        onClick={async () => {
+                          const { auth } = getFirebaseApp()
+                          if (!auth) {
+                            console.error('Firebase error: auth not available')
+                            return
+                          }
+
+                          try {
+                            await signOut(auth)
+                          } catch (e) {
+                            alert('Error signing out')
+                            return
+                          }
+                        }}
+                      >
                         Sign Out
                       </button>
                     </div>
@@ -203,4 +215,4 @@ function Navbar() {
   );
 }
 
-export default Navbar;
+export default Navbar
