@@ -20,14 +20,10 @@ Expected Outcome: When everything is correct and unique, upload the information 
 Test Case: Click donate button
 Expected Outcome: Pop out the window to allow the user to top up the debit
 
-4. User Story: As a Streamer, I want to be able to see my Streamkey in settings, so I can use it to go libe.
-
-
-Test Case: Click unfollow streamer button
-Expected Outcome: Change button text to follow. And remove streamer from the following list.
-
 Test Case: Click donate button
 Expected Outcome: Donation pop up appears and prompts user to choose how much to donate and add to cart then redirects to checkout page
+
+4. User Story: As a Streamer, I want to be able to see my Streamkey in settings, so I can use it to go libe.
 
 Test Case: The streamer visits the settings page
 Expected Outcome: The streamkey is visible in settings.

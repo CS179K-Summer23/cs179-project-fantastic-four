@@ -14,28 +14,35 @@ interface PlayerProps {
     fluid: boolean;
 }
 
-const Player = (props: PlayerProps) => {
-    const [playerEl, setPlayerEl] = useState<HTMLVideoElement | null>(null)
+function Player(props: PlayerProps)  {
+  const [playerEl, setPlayerEl] = useState<HTMLVideoElement | null>(null)
+  const [playerr, setPlayerr] = useState<any>(null)
+  const [hover, setHover] = useState<boolean>(false)
+  const [a, setA] = useState<any>(null)
     const onPlayer = useCallback((el: HTMLVideoElement) => {
       setPlayerEl(el)
     }, [])
   
     useEffect(() => {
+      if (playerr != null) {
+        return;
+      }
       if (playerEl == null) {
         return
-      }
-  
+      }      
       const player = videojs(playerEl, props)
       player.src(props.src)
-
-      return () => {
-        player.dispose()
-      }
+      setPlayerr(player)
     }, [props, playerEl])
   
     return (
         <div data-vjs-player>
-          <video ref={onPlayer} className="video-js vjs-16-9" playsInline />
+          <video 
+            // onMouseEnter={() => setHover(true)}
+            // onMouseLeave={() => setHover(false)}
+            ref={onPlayer} 
+            className="video-js vjs-16-9" playsInline
+          />
         </div>
         
     )
@@ -47,6 +54,7 @@ Player.defaultProps = {
     muted: false,
     preload: "none",
     fluid: true,
+    poster: "https://i.ytimg.com/vi/Jr3tlqXH7is/maxresdefault.jpg",
 }
 
 Player.propTypes = {
