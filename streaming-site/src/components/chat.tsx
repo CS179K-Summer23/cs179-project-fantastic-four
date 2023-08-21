@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { query, doc, where, onSnapshot, collection, addDoc, getDoc, serverTimestamp } from 'firebase/firestore'
+import { query, doc, where, onSnapshot, collection, addDoc, getDoc, serverTimestamp, deleteDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { getFirebaseApp } from '../utils/firebase.config'
 
@@ -8,6 +8,8 @@ type Message = {
   username: string
   timestamp: Date
   streamId: string
+  messageId: string
+  userId: string
 }
 
 function Chat({ streamId }: { streamId: string }) {
@@ -21,7 +23,11 @@ function Chat({ streamId }: { streamId: string }) {
     if (!streamId) return
 
     const unsubscribe = onSnapshot(query(collection(db, 'chat'), where('streamId', '==', streamId)), async ({ docs }) => {
-      if (docs.length === 0) return
+      if (docs.length === 0) {
+        setMessages([])
+        return
+      }
+
       setMessages(await Promise.all(docs.map(async (chatMessage) => {
         const userSnap = await getDoc(doc(db, 'users', chatMessage.data().userId))
 
@@ -30,6 +36,8 @@ function Chat({ streamId }: { streamId: string }) {
           username: userSnap?.data()?.name || 'Anonymous',
           timestamp: chatMessage.data().timestamp,
           streamId: chatMessage.data().streamId,
+          messageId: chatMessage.id,
+          userId: chatMessage.data().userId,
         } as unknown as Message
       })))
     })
@@ -53,6 +61,46 @@ function Chat({ streamId }: { streamId: string }) {
     return new Intl.DateTimeFormat("en-US", options).format(timestamp)
   }
 
+  const deleteChatMessage = async (messageId: string) => {
+    const { db, auth } = getFirebaseApp()
+
+    if (!db) {
+      console.error('Firebase error: Firestore not available')
+      return
+    }
+
+    if (!auth) {
+      console.error('Firebase error: Auth not available')
+      return
+    }
+
+    if (auth.currentUser === null) {
+      alert('Not logged in')
+      return
+    }
+
+    const userId = auth.currentUser.uid
+    const isOriginalCommenter = messages.find((message: Message) => message.messageId === messageId)?.userId === userId
+    const isStreamer = (await getDoc(doc(db, 'users', userId))).data()?.id === (await getDoc(doc(db, 'streams', streamId))).data()?.streamer_id
+
+    if (!isOriginalCommenter && !!isStreamer) {
+      alert('Not authorized to delete this message')
+      return
+    }
+
+    try {
+      await deleteDoc(doc(db, 'chat', messageId))
+    } catch {
+      alert('Error deleting message')
+    }
+  }
+
+  const { db } = getFirebaseApp()
+  const isStreamer = getDoc(doc(db, 'streams', streamId)).then((stream) => {
+    if (!user) return false
+    return stream.data()?.streamer_id === user.uid
+  })
+
   return (
     <section
       className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
@@ -70,6 +118,15 @@ function Chat({ streamId }: { streamId: string }) {
                 <span className="text-gray-400 text-xs">
                   {formatTimestamp(message.timestamp)}
                 </span>
+                {
+                  /* only show delete button if user is streamer or original commenter */
+                  (user?.uid === message.userId) && 
+                  (
+                    <span className="cursor-pointer" onClick={() => deleteChatMessage(message.messageId)}>
+                      X
+                    </span>
+                  )
+                }
               </div>
               <p>{message.text}</p>
             </div>
@@ -79,8 +136,6 @@ function Chat({ streamId }: { streamId: string }) {
 
       <form className="my-4 flex bg-white m" onSubmit={async (e) => {
         e.preventDefault()
-
-        const { db } = getFirebaseApp()
 
         if (!db) {
           alert('Error submitting message')
