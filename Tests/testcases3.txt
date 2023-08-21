@@ -6,10 +6,13 @@ Expect Outcome: The new window pops out with a stripe payment link
 Test Case: Finish the payment
 Expect Outcome: If everything is correct, top up the money to the account. Otherwise, show the payment failed.
 
-Test Case: Check the debit after finish payment
+Test Case: Check the debit after finishing the payment
 Expect Outcome: The amount of debit is changed.
 
 2. User Story: As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
+
+Test Case: The user didn't login the account and try to send message
+Expected Outcome: Show the alert "please sign in the account"
 
 Test Case: The user send the valid message
 Expected Outcome: The message is shown in the streaming room.
