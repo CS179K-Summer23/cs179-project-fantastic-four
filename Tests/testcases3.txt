@@ -20,10 +20,10 @@ Expected Outcome: The message  is disappeared.
 Test Case: A user who did not create the message attempts to delete it.
 Expected Outcome: The message should not disappear.
 
-3. User story: As a streamer, I want to check the chat history when I was streaming. So I can interact with viewers. (1 point)
+3. User story: As a user/streamer, I want to check the chat history when I was streaming. So I can interact with viewers. (1 point)
 
 Test Case: The user joins the streaming room late
-Expected Outcome: The user still can see the chat history.
+Expected Outcome: The user still can see the chat history starting from when the stream was created.
 
 4.  User story: As a viewer, I want to be able to follow the streamer’s account and receive a notification when they start streaming. (2 point)
 
