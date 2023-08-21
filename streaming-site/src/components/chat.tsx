@@ -120,7 +120,7 @@ function Chat({ streamId }: { streamId: string }) {
 
   return (
     <section
-      className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
+      className="flex flex-col justify-between w-full h-full overflow-scroll md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
       style={{ maxWidth: "350px" }}
     >
       <div className="bg-white">

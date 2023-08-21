@@ -9,21 +9,23 @@ Expect Outcome: If everything is correct, top up the money to the account. Other
 Test Case: Check the debit after finishing the payment
 Expect Outcome: The amount of debit is changed.
 
-2. User Story: As a user, I want to chat with others on the stream so that I can communicate with the steamer and other users about the stream being watched. (3 points)
+2. User Story: As a streamer, I want to be able to delete messages in my chat, as well as allow others to delete messages so that the chat can be enjoyable to read. (1 point)
 
-Test Case: The user didn't login the account and try to send message
-Expected Outcome: Show the alert "please sign in the account"
-
-Test Case: The user send the valid message
-Expected Outcome: The message is shown in the streaming room.
-
-Test Case: The user send the empty message
-Expected Outcome: Display the notification said you can't send the empty message.
-
-Test Case: The user joins the streaming room late
-Expected Outcome: The user still can see the chat history.
-
-Test Case: The streamer deletes the message.
+Test Case: The streamer deletes the message in their streaming room.
 Expected Outcome: The message  is disappeared. 
 
+Test Case: The user who created the message deletes it.
+Expected Outcome: The message  is disappeared. 
 
+Test Case: A user who did not create the message attempts to delete it.
+Expected Outcome: The message should not disappear.
+
+3. User story: As a user/streamer, I want to check the chat history when I was streaming. So I can interact with viewers. (1 point)
+
+Test Case: The user joins the streaming room late
+Expected Outcome: The user still can see the chat history starting from when the stream was created.
+
+4.  User story: As a viewer, I want to be able to follow the streamer’s account and receive a notification when they start streaming. (2 point)
+
+Test Case: When a streamer goes live
+Expected Outcome: All users that follow that streamer get a notification that the streamer has gone live.
