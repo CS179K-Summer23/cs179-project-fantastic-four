@@ -1,12 +1,17 @@
 import { useState, useEffect } from 'react'
-import { query, doc, where, onSnapshot, collection, addDoc, getDoc, serverTimestamp, deleteDoc } from 'firebase/firestore'
+import { query, doc, where, orderBy, onSnapshot, collection, addDoc, getDoc, serverTimestamp, deleteDoc } from 'firebase/firestore'
 import { onAuthStateChanged } from 'firebase/auth'
 import { getFirebaseApp } from '../utils/firebase.config'
+
+type Timestamp = {
+  seconds: number
+  nanoseconds: number
+}
 
 type Message = {
   text: string
   username: string
-  timestamp: Date
+  timestamp: Timestamp
   streamId: string
   messageId: string
   userId: string
@@ -22,7 +27,7 @@ function Chat({ streamId }: { streamId: string }) {
     if (!db) return
     if (!streamId) return
 
-    const unsubscribe = onSnapshot(query(collection(db, 'chat'), where('streamId', '==', streamId)), async ({ docs }) => {
+    const unsubscribe = onSnapshot(query(collection(db, 'chat'), where('streamId', '==', streamId), orderBy('timestamp', 'asc')), async ({ docs }) => {
       if (docs.length === 0) {
         setMessages([])
         return
@@ -83,7 +88,10 @@ function Chat({ streamId }: { streamId: string }) {
     const isOriginalCommenter = messages.find((message: Message) => message.messageId === messageId)?.userId === userId
     const isStreamer = (await getDoc(doc(db, 'users', userId))).data()?.id === (await getDoc(doc(db, 'streams', streamId))).data()?.streamer_id
 
-    if (!isOriginalCommenter && !!isStreamer) {
+    console.log('isOriginalCommenter', isOriginalCommenter)
+    console.log('isStreamer', isStreamer)
+
+    if (!isOriginalCommenter || !!isStreamer) {
       alert('Not authorized to delete this message')
       return
     }
@@ -95,11 +103,20 @@ function Chat({ streamId }: { streamId: string }) {
     }
   }
 
-  const { db } = getFirebaseApp()
-  // const isStreamer = getDoc(doc(db, 'streams', streamId)).then((stream) => {
-  //   if (!user) return false
-  //   return stream.data()?.streamer_id === user.uid
-  // })
+  const { db, auth } = getFirebaseApp()
+  const [isStreamer, setStreamerStatus] = useState(false)
+
+  useEffect(() => {
+    (async function () {
+      if (!db || !auth || !auth.currentUser) return
+
+      if ((await getDoc(doc(db, 'users', auth.currentUser?.uid))).data()?.id === (await getDoc(doc(db, 'streams', streamId))).data()?.streamer_id) {
+        setStreamerStatus(true)
+      }
+    }())
+  }, [db, auth, streamId])
+
+  // console.log('isStreamer', isStreamer)
 
   return (
     <section
@@ -116,15 +133,17 @@ function Chat({ streamId }: { streamId: string }) {
               <div className="flex justify-between items-center">
                 <span className="text-gray-600 text-sm">{message.username}</span>
                 <span className="text-gray-400 text-xs">
-                  {formatTimestamp(message.timestamp)}
+                  {formatTimestamp(message.timestamp && new Date(message.timestamp.seconds * 1000))}
                 </span>
                 {
                   /* only show delete button if user is streamer or original commenter */
-                  (user?.uid === message.userId) && 
-                  (
-                    <span className="cursor-pointer" onClick={() => deleteChatMessage(message.messageId)}>
-                      X
-                    </span>
+                  (user?.uid === message.userId || !isStreamer) && (
+                    <button
+                      className="text-red-500 text-xs"
+                      onClick={() => deleteChatMessage(message.messageId)}
+                    >
+                      Delete
+                    </button>
                   )
                 }
               </div>
