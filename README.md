@@ -19,8 +19,7 @@ Express
 WebRTC  
 nginx-rtmp-server  
 Socket.io  
-PostgreSQL  
-Sequelize.js  
+Firebase Authentication and Firestore
 
 # Major Features:
 
