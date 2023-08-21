@@ -1,9 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { Stripe } from 'stripe'; 
-import dotenv from 'dotenv';
-dotenv.config();
 
-const stripe = new Stripe("sk_test_51NdKdDEqkNVKC3nWc9Jn8LZyHZxP3ijTygN157AoJIp0l3PdjtbSgQUVYjcsHmvecE6uWybhHrjAapNjxF23CONs00fJGY0ibJ", {
+const stripe = new Stripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, {
     apiVersion: '2022-11-15', 
   });
 
