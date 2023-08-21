@@ -73,7 +73,7 @@ const DonationForm: React.FC<DonationFormProps> = ({ onClose }) => {
             </button>
 
             <Link
-                href="/checkout"
+                href="https://buy.stripe.com/test_9AQ9Dt4K40Ec6u4bII"
                 className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
                 onClick={handleCheckoutClick}
             >
