@@ -12,18 +12,19 @@ function isEmailValid(email: string): boolean {
   return pattern.test(email);
 }
 
+type UserType = {
+  name: string
+  profilePicture: string
+  email: string
+  birthday: number,
+  age: number,
+  debit: number,
+  stream_key: string
+  title: string
+  description: string
+}
 function Settingpage(): JSX.Element {
-  const [user, setProfile] = useState({
-    name: "",
-    profilePicture: "",
-    email: "",
-    birthday: 0,
-    age: 0,
-    debit: 0,
-    stream_key: "",
-    title: "",
-    description: "",
-  });
+  const [user, setProfile] = useState<any>(null);
 
   useEffect(() => {
     const { auth, db } = getFirebaseApp();

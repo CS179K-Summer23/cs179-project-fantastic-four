@@ -44,7 +44,6 @@ function Homepage(): JSX.Element {
                         controls
                         preload="auto"
                         src={videos[currentIndex]}
-                        className="z-8"
                       />
                     </div>
                   </div>
