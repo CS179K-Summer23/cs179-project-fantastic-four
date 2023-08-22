@@ -189,7 +189,7 @@ function StreamingRoom(): JSX.Element {
                         checkout({
                           lineItems: [
                             {
-                              price: "price_1NhYSSEqkNVKC3nWBfoR2y6i",
+                              price: "price_1Nhrl2EqkNVKC3nWxJE5FoBP",
                               quantity: 1
                             }
                           ]
