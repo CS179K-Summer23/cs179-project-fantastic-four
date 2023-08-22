@@ -5,9 +5,7 @@ import { doc, getDoc, getDocs, query, collection, where, onSnapshot } from "fire
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Player from "../../components/player";
-import Link from "next/link";
-import Modal from "react-modal";
-import DonationForm from "../../components/donation-form";
+import { checkout } from "../../components/checkout"
 import Chat from '../../components/chat';
 
 import { onAuthStateChanged } from "firebase/auth";
@@ -97,9 +95,6 @@ function StreamingRoom(): JSX.Element {
     }())
   }, [router])
 
-  const openDonationModal = () => {
-    setModalIsOpen(true);
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -190,34 +185,24 @@ function StreamingRoom(): JSX.Element {
                       Share
                     </button>
                     <button
-                      onClick={openDonationModal} // Open the modal on click
+                      onClick={(() => {
+                        checkout({
+                          lineItems: [
+                            {
+                              price: "price_1NhYSSEqkNVKC3nWBfoR2y6i",
+                              quantity: 1
+                            }
+                          ]
+                        })
+                      })}
                       className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
                     >
                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 inline-block mr-1">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-</svg>
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
 
                       Donate
                     </button>
-
-                    <Modal
-                      isOpen={modalIsOpen}
-                      onRequestClose={() => setModalIsOpen(false)}
-                      contentLabel="Donation Modal"
-                      style={{
-                        overlay: {
-                          backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        },
-                        content: {
-                          maxWidth: "800px",
-                          maxHeight: "600px",
-                          margin: "0 auto",
-                          padding: "30px",
-                        },
-                      }}
-                    >
-                      <DonationForm onClose={() => setModalIsOpen(false)} />
-                    </Modal>
                   </div>
                 </div>
 
