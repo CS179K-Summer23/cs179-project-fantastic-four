@@ -18,7 +18,6 @@ function Player(props: PlayerProps)  {
   const [playerEl, setPlayerEl] = useState<HTMLVideoElement | null>(null)
   const [playerr, setPlayerr] = useState<any>(null)
   const [hover, setHover] = useState<boolean>(false)
-  const [a, setA] = useState<any>(null)
     const onPlayer = useCallback((el: HTMLVideoElement) => {
       setPlayerEl(el)
     }, [])
@@ -33,7 +32,7 @@ function Player(props: PlayerProps)  {
       const player = videojs(playerEl, props)
       player.src(props.src)
       setPlayerr(player)
-    }, [props, playerEl])
+    }, [props, playerEl, playerr])
   
     return (
         <div data-vjs-player>

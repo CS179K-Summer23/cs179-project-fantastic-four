@@ -97,7 +97,7 @@ function Streams(): JSX.Element {
       console.log(error);
     })
     
-  }, []);
+  }, [streamers, streams]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
