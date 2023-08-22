@@ -18,6 +18,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/signup/index.tsx", "src/pages/signin/index.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "src/pages/signup/index.tsx", "src/pages/signin/index.tsx", "src/pages/api/create-payment-intent.ts"],
   "exclude": ["node_modules"]
 }
