@@ -1,6 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
+import Redirect from 'next/router'
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -12,24 +13,25 @@ function isEmailValid(email: string): boolean {
   return pattern.test(email);
 }
 
-type UserType = {
-  name: string
-  profilePicture: string
-  email: string
-  birthday: number,
-  age: number,
-  debit: number,
-  stream_key: string
-  title: string
-  description: string
-}
 function Settingpage(): JSX.Element {
+  type UserType = {
+    name: string
+    profilePicture: string
+    email: string
+    birthday: number,
+    age: number,
+    debit: number,
+    stream_key: string
+    title: string
+    description: string
+  }
   const [user, setProfile] = useState<any>(null);
+  const [userPublic, setPublicProfile] = useState<any>(null);
 
   useEffect(() => {
     const { auth, db } = getFirebaseApp();
 
-    if (!auth || !db) {
+    if (!auth || !db ) {
       console.error("Firebase not available");
       return;
     }
@@ -37,16 +39,27 @@ function Settingpage(): JSX.Element {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const { uid } = user;
-        const docRef = doc(db, "users", uid);
-
+        const docRef = doc(db, "accounts", uid);
+        
         getDoc(docRef).then((userData) => {
           if (!userData.exists()) {
-            console.error("Firebase Error: User does not exist in firestore");
+            console.error("Firebase Error: User Account does not exist in firestore");
             return;
           }
+          const userId = userData.data()['id']
+          setProfile(userData.data() as UserType);
 
-          setProfile(userData.data() as typeof user);
+          getDoc(doc(db, "users", '' + userId)).then((userPublicData) => {
+            if (!userPublicData.exists()) {
+              console.error("Firebase Error: User User does not exist in firestore");
+              return;
+            }
+  
+            setPublicProfile(userPublicData.data() as typeof user);
+          });
         });
+
+
       } else {
         console.log("No user signed in");
       }
@@ -62,7 +75,7 @@ function Settingpage(): JSX.Element {
       return;
     }
 
-    const userRef = doc(db, "users", auth.currentUser.uid);
+    const userRef = doc(db, "accounts", auth.currentUser.uid);
     if (!isEmailValid(updatedProfile.email)) {
       alert("Please enter a valid email address");
       return;
@@ -77,11 +90,39 @@ function Settingpage(): JSX.Element {
     }
   };
 
+  const updateUserPublicProfile = async (updatedProfile: typeof user) => {
+    const { auth, db } = getFirebaseApp();
+
+    if (!auth || !db || !auth.currentUser) {
+      console.error("Firebase not available or user not signed in");
+      return;
+    }
+
+    const userRef = doc(db, "users", '' + user.id);
+
+    try {
+      await updateDoc(userRef, updatedProfile);
+      console.log("Stream info updated successfully");
+      alert("Stream Info updated successfully!"); // Displaying an alert
+    } catch (error) {
+      console.error("Failed to update stream info", error);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
     setProfile({
       ...user,
+      [name]: value,
+    });
+  };
+
+  const handlePublicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setPublicProfile({
+      ...userPublic,
       [name]: value,
     });
   };
@@ -170,33 +211,6 @@ function Settingpage(): JSX.Element {
                   />
                 </div>
 
-
-                <div className="col-span-1">
-                  <label htmlFor="Title" className="text-gray-700">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={user?.title}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 rounded border"
-                  />
-                </div>
-
-                <div className="col-span-1">
-                  <label htmlFor="Description" className="text-gray-700">
-                    Description
-                  </label>
-                  <input
-                    type="text"
-                    name="description"
-                    value={user?.description}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 rounded border"
-                  />
-                </div>
-
                 <div className="col-span-1">
                   <label htmlFor="StreamURL" className="text-gray-700">
                     StreamURL
@@ -240,6 +254,56 @@ function Settingpage(): JSX.Element {
               </div>
               <button
                 onClick={() => updateUserProfile(user)}
+                className="float-right bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded mt-4"
+              >
+                Submit Changes
+              </button>
+            </div>
+          </section>
+
+          <section>
+          <h2 className="mt-8 text-xl font-bold mb-4">Stream Settings</h2>
+            <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
+              <div className="grid grid-rows-3 gap-4 w-full">
+                <div className="col-span-1">
+                  <label htmlFor="Title" className="text-gray-700">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={userPublic?.title}
+                    onChange={handlePublicChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label htmlFor="Description" className="text-gray-700">
+                    Description
+                  </label>
+                  <input
+                    type="text"
+                    name="description"
+                    value={userPublic?.description}
+                    onChange={handlePublicChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label htmlFor="Category" className="text-gray-700">
+                    Category
+                  </label>
+                  <input
+                    type="text"
+                    name="category"
+                    value={userPublic?.category}
+                    onChange={handlePublicChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={() => updateUserPublicProfile(userPublic)}
                 className="float-right bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded mt-4"
               >
                 Submit Changes
