@@ -6,6 +6,7 @@ import Player from "../../components/player";
 import Link from "next/link";
 import Modal from "react-modal";
 import DonationForm from "../../components/donation-form";
+import Chat from '../../components/chat';
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../../utils/firebase.config";
@@ -20,15 +21,6 @@ function StreamingRoom(): JSX.Element {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   // const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [followedList, setFollowedList] = useState<string[]>([]);
-
-  const formatTimestamp = (timestamp: Date) => {
-    const options: Intl.DateTimeFormatOptions = {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    };
-    return new Intl.DateTimeFormat("en-US", options).format(timestamp);
-  };
 
   const handleFollow = () => {
     const streamer = "StreamerUsername";
@@ -65,8 +57,6 @@ function StreamingRoom(): JSX.Element {
     setModalIsOpen(true);
   };
 
-
- 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar />
@@ -134,7 +124,7 @@ function StreamingRoom(): JSX.Element {
                       Share
                     </button>
 
-                    <button
+                    {/* <button
                       onClick={openDonationModal} // Open the modal on click
                       className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
                     >
@@ -143,7 +133,29 @@ function StreamingRoom(): JSX.Element {
 </svg>
 
                       Donate
-                    </button>
+                    </button> */}
+                    <a
+                      href="https://buy.stripe.com/test_9AQ9Dt4K40Ec6u4bII" 
+                      className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
+                      target="_blank" 
+                      rel="noopener noreferrer" 
+                    >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="1.5"
+                        stroke="currentColor"
+                        className="w-6 h-6 inline-block mr-1"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                    </svg>
+                      Donate
+                    </a>
 
                     <Modal
                       isOpen={modalIsOpen}
@@ -192,41 +204,7 @@ function StreamingRoom(): JSX.Element {
             </div>
           </section>
 
-          <section
-            className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
-            style={{ maxWidth: "350px" }}
-          >
-            <div className="bg-white">
-              <h2 className="font-bold text-center border-b-2 text-m pb-1">
-                STREAM CHAT
-              </h2>
-              <div className="chat-container p-2 m-0 overflow-y-auto">
-                {messages.map((message, index) => (
-                  <div key={index} className="mb-2">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-600 text-sm">test</span>
-                      <span className="text-gray-400 text-xs">
-                        {formatTimestamp(message.timestamp)}
-                      </span>
-                    </div>
-                    <p>{message.text}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <form className="my-4 flex bg-white m" onSubmit={handleSubmit}>
-              <input
-                className="w-full rounded-l-lg p-2 border border-gray-900"
-                type="text"
-                placeholder="Write a message..."
-                ref={inputRef}
-              />
-              <button className="py-2 px-2 bg-gray-900 text-white font-semibold hover:text-white border hover:bg-gray-600 border-gray-900 hover:border-transparent rounded-r-lg">
-                Send
-              </button>
-            </form>
-          </section>
+         <Chat streamId="streamingroom1" />
         </div>
       </div>
 
