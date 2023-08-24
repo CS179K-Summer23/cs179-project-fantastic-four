@@ -21,7 +21,7 @@ function Navbar() {
     onAuthStateChanged(auth, (user) => {
       if (user) {
         const { uid } = user;
-        const docRef = doc(db, "users", uid);
+        const docRef = doc(db, "accounts", uid);
 
         getDoc(docRef).then((userData) => {
           if (!userData.exists()) {
