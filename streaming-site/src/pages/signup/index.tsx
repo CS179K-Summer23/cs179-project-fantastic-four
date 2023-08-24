@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Formik, Form } from 'formik'
 import { object, string } from 'yup'
 import { createUserWithEmailAndPassword } from "firebase/auth"
-import { setDoc, doc } from 'firebase/firestore'
+import { setDoc, doc, getDoc, collection, where, query, getDocs } from 'firebase/firestore'
 import Input from '../../components/input'
 import { getFirebaseApp } from '../../utils/firebase.config'
 
@@ -32,19 +32,33 @@ function Signup() {
               return
             }
 
-            createUserWithEmailAndPassword(auth, email, password)
-              .then((userCredential) => {
-                const user = userCredential.user
-                return setDoc(doc(db, "users", user.uid), {
-                  name,
-                })
-              })
-              .then(() => Redirect.push('/'))
-              .catch((error) => {
-                const errorMessage = error.message
-                setErrorMessage(errorMessage)
+            const userQuery = query(
+              collection(db, "users"), 
+              where("name", "==", name)
+            );      
+
+            getDocs(userQuery).then((userSnap) => {
+              if (!userSnap.empty) {
+                setErrorMessage('A user with this name already exists.')
                 setSubmitting(false)
-              })
+                return
+              }
+              createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                  const user = userCredential.user
+                  // setDoc(doc(db, "users", name), {})
+                  return setDoc(doc(db, "accounts", user.uid), {
+                    name,
+                    email,
+                  })
+                })
+                .then(() => Redirect.push('/'))
+                .catch((error) => {
+                  const errorMessage = error.message
+                  setErrorMessage(errorMessage)
+                  setSubmitting(false)
+                })
+            })
           }}
         >
           {({ handleSubmit, isSubmitting }) => (

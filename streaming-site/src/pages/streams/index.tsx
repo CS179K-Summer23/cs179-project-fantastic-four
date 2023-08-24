@@ -32,7 +32,7 @@ function Streams(): JSX.Element {
     avatar_url: string;
   }
   
-  const [streams, setStreams] = useState<Stream[]>([]);
+  const [streams, setStreams] = useState<any>(null);
   const [streamers, setStreamers] = useState<Streamer[]>([]);
 
 
@@ -45,7 +45,7 @@ function Streams(): JSX.Element {
       console.error("Firebase not available");
       return;
     }
-
+    if (streams) return;
     const usersRef = collection(db, "users");
 
     const fetchStreamer = async (streamer_id: string) => {
@@ -68,30 +68,23 @@ function Streams(): JSX.Element {
       const streamsArr: any[] = await Promise.all(streamsSnapshot.docs
           .filter((stream) => stream.data()['end_time'] === null)
           .map( async (stream) => {   
-                      return stream.data();
+              return stream.data();
       }));
 
       const streamersArr: any[] = await Promise.all(streamsArr
         .map( async(stream) => {
           return await fetchStreamer(stream['streamer_id'])
             .then(async (data) => {
-              console.log('data', data);
               return data;
           });
       }));
 
-      console.log('a', streamsArr);
-      console.log('b', streamersArr);
       return [streamsArr, streamersArr];
     };
 
     fetchStreams().then(async (data: any[]) => {
-      console.log('then', data);
       if (data[0]) setStreams(data[0]);
       if (data[1]) setStreamers(data[1]);
-
-      console.log(streams);
-      console.log(streamers);
 
     }).catch(error => {
       console.log(error);
@@ -105,7 +98,7 @@ function Streams(): JSX.Element {
       <main className="flex-1">
         <div className="container mx-auto p-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
-                {streams.map((stream, i) => (
+                {streams && streams.map( (stream: Stream, i: number) => (
                   <div
                     key={stream.id}
                     className="rounded overflow-hidden shadow-lg p-4 bg-white"
@@ -121,7 +114,7 @@ function Streams(): JSX.Element {
                     </div>
 
                     <div className="">
-                      <Link href={'/streamingroom/' + streamers[i].name}>
+                      <Link href={'/' + streamers[i].name}>
                         <div
                           className="relative"
                         >
@@ -153,14 +146,14 @@ function Streams(): JSX.Element {
                         />
                         <div className="pl-9">
                           <h3 className="font-bold text-xl hover:text-gray-500">
-                            <Link href={'/streamingroom/' + streamers[i].name}>
+                            <Link href={'/' + streamers[i].name}>
                               {stream.title}
                             </Link>
                           </h3>
                           <div className="flex justify-between items-center">
 
                           <Link
-                            href={'/streamingroom/' + streamers[i].name}
+                            href={'/' + streamers[i].name}
                             className="text-sm text-gray-700 hover:text-gray-500"
                           >
                             {streamers[i].name}
