@@ -6,52 +6,44 @@ import Player from "../../components/player";
 import Link from "next/link";
 import Modal from "react-modal";
 import DonationForm from "../../components/donation-form";
-import Chat from '../../components/chat';
+import Chat from "../../components/chat";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../../utils/firebase.config";
 
 function StreamingRoom(): JSX.Element {
   const [playerKey, setPlayerKey] = useState<number>(0);
-
+  const [user, setUser] = useState<any>(null);
   const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
     []
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
   // const chatContainerRef = useRef<HTMLDivElement | null>(null);
-  const [followedList, setFollowedList] = useState<string[]>([]);
+  const [following, setFollowedList] = useState<string[]>([]);
 
-  const handleFollow = () => {
-    const streamer = "StreamerUsername";
-
-    if (!followedList.includes(streamer)) {
-      setFollowedList([...followedList, streamer]);
+  const handleFollow = (streamerId: number) => {
+    if (!following.includes(streamerId)) {
+      setFollowedList([...following, streamerId]);
     }
   };
-  
-  const [user, setUser] = useState<any>(null);
 
-  const isFollowed = followedList.includes("StreamerUsername");
+  const isFollowed = following.includes("StreamerUsername");
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     if (inputRef.current) {
       const inputValue = inputRef.current.value.trim();
-  
+
       if (inputValue === "") {
         alert("Message cannot be empty!");
       } else {
-        setMessages([
-          ...messages,
-          { text: inputValue, timestamp: new Date() },
-        ]);
+        setMessages([...messages, { text: inputValue, timestamp: new Date() }]);
         inputRef.current.value = "";
       }
     }
   };
-  
 
   const openDonationModal = () => {
     setModalIsOpen(true);
@@ -128,10 +120,20 @@ function StreamingRoom(): JSX.Element {
                       onClick={openDonationModal} // Open the modal on click
                       className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
                     >
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 inline-block mr-1">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-</svg>
-
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        className="w-6 h-6 inline-block mr-1"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
                       Donate
                     </button>
 
@@ -182,7 +184,7 @@ function StreamingRoom(): JSX.Element {
             </div>
           </section>
 
-         <Chat streamId="streamingroom1" />
+          <Chat streamId="streamingroom1" />
         </div>
       </div>
 
