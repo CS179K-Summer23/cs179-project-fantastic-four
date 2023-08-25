@@ -13,7 +13,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
-import { setUserId } from 'firebase/analytics'
+import { setUserId } from "firebase/analytics";
 
 type Timestamp = {
   seconds: number;
@@ -31,9 +31,9 @@ type Message = {
 
 function Chat({ streamerId }: { streamerId: number }) {
   const [user, setUser] = useState<any>(null);
-  const [userId, setUserId] = useState<any>(null)
+  const [userId, setUserId] = useState<any>(null);
   const [messages, setMessages] = useState<any>([]);
-  const [isStreamer, setStreamerStatus] = useState(false)
+  const [isStreamer, setStreamerStatus] = useState(false);
 
   useEffect(() => {
     const { db, auth } = getFirebaseApp();
@@ -56,7 +56,7 @@ function Chat({ streamerId }: { streamerId: number }) {
           await Promise.all(
             docs.map(async (chatMessage) => {
               const userSnap = await getDoc(
-                doc(db, "users", '' + chatMessage.data().userId)
+                doc(db, "users", "" + chatMessage.data().userId)
               );
               return {
                 text: chatMessage.data().text,
@@ -75,16 +75,13 @@ function Chat({ streamerId }: { streamerId: number }) {
     onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser);
-        await getDoc(doc(db, 'accounts', firebaseUser.uid))
-          .then((data) => {
-            if (data.exists()) {
-              const userId = data.data()['id']
-              setUserId(userId) 
-              setStreamerStatus(userId === streamerId)
-            }
-
-        })
-        
+        await getDoc(doc(db, "accounts", firebaseUser.uid)).then((data) => {
+          if (data.exists()) {
+            const userId = data.data()["id"];
+            setUserId(userId);
+            setStreamerStatus(userId === streamerId);
+          }
+        });
       } else {
         setUser(null);
       }
@@ -119,9 +116,10 @@ function Chat({ streamerId }: { streamerId: number }) {
       return;
     }
 
-    const isOriginalCommenter = messages.find((message: Message) => message.messageId === messageId)?.userId === userId
-    const isStreamer = userId === streamerId
-
+    const isOriginalCommenter =
+      messages.find((message: Message) => message.messageId === messageId)
+        ?.userId === userId;
+    const isStreamer = userId === streamerId;
 
     if (!(isOriginalCommenter || isStreamer)) {
       alert("Not authorized to delete this message");
@@ -135,18 +133,17 @@ function Chat({ streamerId }: { streamerId: number }) {
     }
   };
 
-  const { db, auth } = getFirebaseApp()
+  const { db, auth } = getFirebaseApp();
 
   useEffect(() => {
     (async function () {
       if (!db || !auth || !auth.currentUser) return;
 
       if (userId === streamerId) {
-        setStreamerStatus(true)
+        setStreamerStatus(true);
       }
     })();
   }, [db, auth, streamerId]);
-
 
   return (
     <section
@@ -172,7 +169,7 @@ function Chat({ streamerId }: { streamerId: number }) {
                 </span>
                 {
                   /* only show delete button if user is streamer or original commenter */
-                  ((userId === message.userId) || isStreamer) && (
+                  (userId === message.userId || isStreamer) && (
                     <button
                       className="text-red-500 text-xs"
                       onClick={() => deleteChatMessage(message.messageId)}

@@ -1,153 +1,150 @@
 import { useState, useEffect } from "react";
 import {
   query,
-  doc,
   where,
-  orderBy,
-  onSnapshot,
+  getDocs,
   collection,
+  updateDoc,
   addDoc,
-  getDoc,
-  serverTimestamp,
   deleteDoc,
+  onSnapshot,
+  serverTimestamp,
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
 
-type Timestamp = {
-  seconds: number;
-  nanoseconds: number;
-};
-
-type Message = {
-  text: string;
-  username: string;
-  timestamp: Timestamp;
-  streamId: string;
-  messageId: string;
-  userId: string;
-};
-
-function Chat({ streamId }: { streamId: string }) {
-  const [user, setUser] = useState<any>(null);
-  const [messages, setMessages] = useState<any>([]);
+function Follow({ userId }: { userId: string }) {
+  const [isUserFollowing, setIsUserFollowing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const { auth, db } = getFirebaseApp();
 
   useEffect(() => {
-    const { db, auth } = getFirebaseApp();
+    const { auth, db } = getFirebaseApp();
 
-    if (!db) return;
-    if (!streamId) return;
+    if (!auth || !db) {
+      console.error("Firebase not available");
+      return;
+    }
 
-    const unsubscribe = onSnapshot(
-      query(
-        collection(db, "chat"),
-        where("streamId", "==", streamId),
-        orderBy("timestamp", "asc")
-      ),
-      async ({ docs }) => {
-        if (docs.length === 0) {
-          setMessages([]);
-          return;
-        }
-
-        setMessages(
-          await Promise.all(
-            docs.map(async (chatMessage) => {
-              const userSnap = await getDoc(
-                doc(db, "users", chatMessage.data().userId)
-              );
-
-              return {
-                text: chatMessage.data().text,
-                username: userSnap?.data()?.name || "Anonymous",
-                timestamp: chatMessage.data().timestamp,
-                streamId: chatMessage.data().streamId,
-                messageId: chatMessage.id,
-                userId: chatMessage.data().userId,
-              } as unknown as Message;
-            })
-          )
-        );
-      }
-    );
-
-    onAuthStateChanged(auth, (firebaseUser) => {
-      if (firebaseUser) {
-        setUser(firebaseUser);
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const { uid } = user;
+        const followingStatus = await doesUserAFollowUserB(uid, userId);
+        setIsUserFollowing(followingStatus);
       } else {
-        setUser(null);
+        console.log("No user signed in");
       }
     });
-    return () => unsubscribe();
-  }, [streamId, user]);
+  }, [db, auth, userId]);
 
-  const formatTimestamp = (timestamp: Date) => {
-    const options: Intl.DateTimeFormatOptions = {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: true,
-    };
-    return new Intl.DateTimeFormat("en-US", options).format(timestamp);
+  const handleFollowButtonClick = async () => {
+    if (!auth?.currentUser || loading) return;
+
+    setLoading(true);
+    try {
+      if (isUserFollowing) {
+        await unfollowUser(auth.currentUser.uid, userId);
+        setIsUserFollowing(false);
+      } else {
+        await followUser(auth.currentUser.uid, userId);
+        setIsUserFollowing(true);
+      }
+    } catch (error) {
+      console.error("Error while trying to follow/unfollow user:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const deleteChatMessage = async (messageId: string) => {
+  const doesUserAFollowUserB = async (userAId: string, userBId: string) => {
     const { db, auth } = getFirebaseApp();
 
-    if (!db) {
-      console.error("Firebase error: Firestore not available");
-      return;
-    }
-
-    if (!auth) {
-      console.error("Firebase error: Auth not available");
-      return;
-    }
-
-    if (auth.currentUser === null) {
-      alert("Not logged in");
-      return;
-    }
-
-    const userId = auth.currentUser.uid;
-    const isOriginalCommenter =
-      messages.find((message: Message) => message.messageId === messageId)
-        ?.userId === userId;
-    const isStreamer =
-      (await getDoc(doc(db, "users", userId))).data()?.id ===
-      (await getDoc(doc(db, "streams", streamId))).data()?.streamer_id;
-
-    console.log("isOriginalCommenter", isOriginalCommenter);
-    console.log("isStreamer", isStreamer);
-
-    if (!isOriginalCommenter || !!isStreamer) {
-      alert("Not authorized to delete this message");
-      return;
-    }
-
     try {
-      await deleteDoc(doc(db, "chat", messageId));
-    } catch {
-      alert("Error deleting message");
+      const q = query(
+        collection(db, "follows"),
+        where("followerId", "==", userAId),
+        where("followingId", "==", userBId)
+      );
+
+      const querySnapshot = await getDocs(q);
+      return !querySnapshot.empty;
+    } catch (error) {
+      console.error("Error checking follow status: ", error);
+      return false;
     }
   };
 
-  const { db, auth } = getFirebaseApp();
-  const [isStreamer, setStreamerStatus] = useState(false);
+  const followUser = async (followerId: string, followingId: string) => {
+    const { db, auth } = getFirebaseApp();
 
-  useEffect(() => {
-    (async function () {
-      if (!db || !auth || !auth.currentUser) return;
+    try {
+      await addDoc(collection(db, "follows"), {
+        followerId,
+        followingId,
+        followTime: serverTimestamp(),
+      });
+      console.log("User followed successfully");
+    } catch (error) {
+      console.error("Error following user: ", error);
+    }
+  };
 
-      if (
-        (await getDoc(doc(db, "users", auth.currentUser?.uid))).data()?.id ===
-        (await getDoc(doc(db, "streams", streamId))).data()?.streamer_id
-      ) {
-        setStreamerStatus(true);
-      }
-    })();
-  }, [db, auth, streamId]);
+  const unfollowUser = async (followerId: string, followingId: string) => {
+    const { db, auth } = getFirebaseApp();
 
-  // console.log('isStreamer', isStreamer)
+    try {
+      const q = query(
+        collection(db, "follows"),
+        where("followerId", "==", followerId),
+        where("followingId", "==", followingId)
+      );
+
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(async (doc) => {
+        await deleteDoc(doc.ref);
+      });
+
+      console.log("User unfollowed successfully");
+    } catch (error) {
+      console.error("Error unfollowing user: ", error);
+    }
+  };
+
+  // useEffect(() => {
+  //   if (!userId) return;
+  //   const checkFollowStatus = async () => {
+  //     if (auth?.currentUser) {
+  //       const status = await doesUserAFollowUserB(auth.currentUser.uid, userId);
+  //       setIsUserFollowing(status);
+  //     }
+  //   };
+
+  //   checkFollowStatus();
+  // }, [db, auth, userId]);
+
+  return (
+    <button
+      className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
+      disabled={loading}
+      onClick={handleFollowButtonClick}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        stroke="currentColor"
+        className="w-6 h-6 inline-block mr-1"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+        />
+      </svg>
+      {loading ? "Processing..." : isUserFollowing ? "Unfollow" : "Follow"}
+    </button>
+  );
 }
 
-export default Chat;
+export default Follow;

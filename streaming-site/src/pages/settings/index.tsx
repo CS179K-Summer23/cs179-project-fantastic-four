@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
-import Redirect from 'next/router'
+import Redirect from "next/router";
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -15,23 +15,23 @@ function isEmailValid(email: string): boolean {
 
 function Settingpage(): JSX.Element {
   type UserType = {
-    name: string
-    profilePicture: string
-    email: string
-    birthday: number,
-    age: number,
-    debit: number,
-    stream_key: string
-    title: string
-    description: string
-  }
+    name: string;
+    profilePicture: string;
+    email: string;
+    birthday: number;
+    age: number;
+    debit: number;
+    stream_key: string;
+    title: string;
+    description: string;
+  };
   const [user, setProfile] = useState<any>(null);
   const [userPublic, setPublicProfile] = useState<any>(null);
 
   useEffect(() => {
     const { auth, db } = getFirebaseApp();
 
-    if (!auth || !db ) {
+    if (!auth || !db) {
       console.error("Firebase not available");
       return;
     }
@@ -40,26 +40,28 @@ function Settingpage(): JSX.Element {
       if (user) {
         const { uid } = user;
         const docRef = doc(db, "accounts", uid);
-        
+
         getDoc(docRef).then((userData) => {
           if (!userData.exists()) {
-            console.error("Firebase Error: User Account does not exist in firestore");
+            console.error(
+              "Firebase Error: User Account does not exist in firestore"
+            );
             return;
           }
-          const userId = userData.data()['id']
+          const userId = userData.data()["id"];
           setProfile(userData.data() as UserType);
 
-          getDoc(doc(db, "users", '' + userId)).then((userPublicData) => {
+          getDoc(doc(db, "users", "" + userId)).then((userPublicData) => {
             if (!userPublicData.exists()) {
-              console.error("Firebase Error: User User does not exist in firestore");
+              console.error(
+                "Firebase Error: User User does not exist in firestore"
+              );
               return;
             }
-  
+
             setPublicProfile(userPublicData.data() as typeof user);
           });
         });
-
-
       } else {
         console.log("No user signed in");
       }
@@ -98,7 +100,7 @@ function Settingpage(): JSX.Element {
       return;
     }
 
-    const userRef = doc(db, "users", '' + user.id);
+    const userRef = doc(db, "users", "" + user.id);
 
     try {
       await updateDoc(userRef, updatedProfile);
@@ -238,7 +240,7 @@ function Settingpage(): JSX.Element {
                     className="w-full p-2 mt-1 rounded border cursor-not-allowed"
                   />
                 </div>
-                
+
                 <div className="col-span-1">
                   <label htmlFor="debit" className="text-gray-700">
                     Debit
@@ -262,7 +264,7 @@ function Settingpage(): JSX.Element {
           </section>
 
           <section>
-          <h2 className="mt-8 text-xl font-bold mb-4">Stream Settings</h2>
+            <h2 className="mt-8 text-xl font-bold mb-4">Stream Settings</h2>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
               <div className="grid grid-rows-3 gap-4 w-full">
                 <div className="col-span-1">
