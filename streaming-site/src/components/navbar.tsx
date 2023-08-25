@@ -5,7 +5,6 @@ import { doc, getDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../utils/firebase.config";
 import { signOut } from "firebase/auth";
 
-
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -170,17 +169,18 @@ function Navbar() {
                       <button
                         className="text-gray-700 block px-4 py-2 text-sm"
                         onClick={async () => {
-                          const { auth } = getFirebaseApp()
+                          const { auth } = getFirebaseApp();
                           if (!auth) {
-                            console.error('Firebase error: auth not available')
-                            return
+                            console.error("Firebase error: auth not available");
+                            return;
                           }
 
                           try {
-                            await signOut(auth)
+                            await signOut(auth);
+                            location.reload();
                           } catch (e) {
-                            alert('Error signing out')
-                            return
+                            alert("Error signing out");
+                            return;
                           }
                         }}
                       >
@@ -215,4 +215,4 @@ function Navbar() {
   );
 }
 
-export default Navbar
+export default Navbar;
