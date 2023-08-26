@@ -28,7 +28,7 @@ function Share() {
           stroke-width="1.5"
           stroke="currentColor"
           className="w-6 h-6 inline-block mr-1"
-        >
+          >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -38,7 +38,8 @@ function Share() {
         Share
       </button>
       {isOpen && (
-        <div className="absolute -top-14 right-0 z-10 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div className="absolute -top-20 right-0 z-8 w-40 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <text className="pl-1 text-sm font-bold">Share via</text>
           <div className="py-1 flex justify-around">
             <TwitterShareButton
               url={url}
@@ -47,7 +48,6 @@ function Share() {
             >
               <TwitterIcon size={32} round />
             </TwitterShareButton>
-
             <FacebookShareButton
               url={url}
               quote={title}
@@ -55,7 +55,6 @@ function Share() {
             >
               <FacebookIcon size={32} round />
             </FacebookShareButton>
-
             <RedditShareButton
               url={url}
               title={title}

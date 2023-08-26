@@ -27,6 +27,8 @@ function StreamingRoom(): JSX.Element {
     []
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const recaptchaRef = React.createRef();
+
   const [modalIsOpen, setModalIsOpen] = useState(false);
   // const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [followedList, setFollowedList] = useState<string[]>([]);
@@ -240,7 +242,7 @@ function StreamingRoom(): JSX.Element {
                       viewBox="0 0 24 24"
                       stroke-width="1.5"
                       stroke="currentColor"
-                      className="w-6 h-6"
+                      className="w-6 h-6 inline-block mr-1"
                     >
                       <path
                         stroke-linecap="round"
