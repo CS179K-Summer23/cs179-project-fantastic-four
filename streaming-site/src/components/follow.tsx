@@ -13,6 +13,11 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
 
+type Follow = {
+  followerId: string;
+  followingId: string;
+};
+
 function Follow({ userId }: { userId: string }) {
   const [isUserFollowing, setIsUserFollowing] = useState(false);
   const [loading, setLoading] = useState(false);

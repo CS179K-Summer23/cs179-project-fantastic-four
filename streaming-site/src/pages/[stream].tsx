@@ -21,6 +21,7 @@ import Share from "../components/share";
 
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
+import Follow from "../components/follow";
 
 function StreamingRoom(): JSX.Element {
   const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
@@ -39,18 +40,6 @@ function StreamingRoom(): JSX.Element {
   const [streamer, setStreamer] = useState<any>(null);
 
   const router = useRouter();
-
-  const handleFollow = () => {
-    const streamer = "StreamerUsername";
-
-    if (!followedList.includes(streamer)) {
-      setFollowedList([...followedList, streamer]);
-    }
-  };
-
-  const [user, setUser] = useState<any>(null);
-
-  const isFollowed = followedList.includes("StreamerUsername");
 
   // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   //   e.preventDefault();
@@ -167,7 +156,7 @@ function StreamingRoom(): JSX.Element {
                     {stream?.title || streamer?.title}
                   </h2>
                   <div className="text-gray-600 text-m pt-2">
-                    <button
+                    {/* <button
                       className={`text-center ${
                         isFollowed ? "bg-gray-600" : "bg-gray-900"
                       } text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600`}
@@ -188,7 +177,8 @@ function StreamingRoom(): JSX.Element {
                         />
                       </svg>
                       {isFollowed ? "Following" : "Follow"}
-                    </button>
+                    </button> */}
+                    <Follow userId={streamer?.id}></Follow>
                     <Share></Share>
 
                     <button
