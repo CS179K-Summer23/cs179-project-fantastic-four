@@ -1,13 +1,64 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  getDocs,
+  collection,
+  Firestore,
+} from "firebase/firestore";
 import { getFirebaseApp } from "../utils/firebase.config";
 import { signOut } from "firebase/auth";
 
 function Navbar() {
-  const [isOpen, setIsOpen] = useState(false);
+  interface Account {
+    id: any;
+    name: string;
+  }
+
+  const [isMenuOpen, setIsMenuOpen] = useState(false); // For side menu
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false); // For settings drop-down
   const [user, setUser] = useState<any>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [isInputFocused, setInputFocused] = useState(false);
+
+  const handleSearch = async (
+    db: Firestore,
+    searchTerm: string,
+    setSearchResults: React.Dispatch<React.SetStateAction<any[]>>
+  ) => {
+    if (!db) {
+      console.error("Firebase error: Database not available");
+      return;
+    }
+
+    const searchInCollection = async (colName: string, fields: string[]) => {
+      const collectionRef = collection(db, colName);
+      const snapshot = await getDocs(collectionRef);
+      return snapshot.docs
+        .map((doc) => ({ ...doc.data(), id: doc.id }))
+        .filter((doc: any) =>
+          fields.some((field) => doc[field]?.includes(searchTerm))
+        );
+    };
+
+    const accountResults = await searchInCollection("accounts", ["name"]);
+    const streamResults = await searchInCollection("streams", [
+      "title",
+      "description",
+    ]);
+    const categoryResults = await searchInCollection("categories", ["name"]);
+
+    const combinedResults = [
+      ...accountResults.map((r) => ({ ...r, type: "Account" })),
+      ...streamResults.map((r) => ({ ...r, type: "Stream" })),
+      ...categoryResults.map((r) => ({ ...r, type: "Category" })),
+    ];
+
+    setSearchResults(combinedResults);
+  };
 
   useEffect(() => {
     const { auth, db } = getFirebaseApp();
@@ -28,11 +79,13 @@ function Navbar() {
             return;
           }
 
-          setUser(userData.data() as any);
+          setUser(userData.data());
         });
       }
     });
-  }, []);
+
+    handleSearch(db, searchTerm, setSearchResults);
+  }, [searchTerm]);
 
   return (
     <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 py-1">
@@ -43,11 +96,13 @@ function Navbar() {
       </div>
       <div className="block lg:hidden pb-2">
         <button
-          onClick={() => setIsOpen(!isOpen)}
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="flex items-center px-3 py-2 border rounded text-teal-200 border-teal-400 hover:text-white hover:border-white"
         >
           <svg
-            className={`fill-current h-3 w-3 ${isOpen ? "hidden" : "block"}`}
+            className={`fill-current h-3 w-3 ${
+              isMenuOpen ? "hidden" : "block"
+            }`}
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -57,7 +112,7 @@ function Navbar() {
       </div>
       <div
         className={`w-full block flex-grow lg:flex lg:items-center lg:w-auto ${
-          isOpen ? "block" : "hidden"
+          isMenuOpen ? "block" : "hidden"
         }`}
       >
         <div className="text-sm lg:flex-grow">
@@ -82,33 +137,63 @@ function Navbar() {
           </Link>
         </div>
 
-        <form className="text-sm mr-20 flex pb-2">
-          <input
-            className="bg-grey-lighter rounded py-2 mt-4 mb-2 px-4 w-full"
-            type="search"
-            placeholder="Search"
-          />
-          <button
-            type="submit"
-            className="p-2 ml-1 mt-4 mb-2 text-sm font-medium text-white rounded-lg border border-white-700 hover:text-teal-500 hover:bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-          >
-            <svg
-              className="w-4 h-"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 20 20"
-            >
-              <path
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
-              />
-            </svg>
-          </button>
-        </form>
+        <div className="relative">
+          <form className="text-sm mr-20 flex pb-2">
+            <input
+              className="bg-grey-lighter rounded py-2 mt-4 mb-2 px-4 w-full"
+              type="search"
+              placeholder="Search"
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onFocus={() => setInputFocused(true)}
+              onBlur={() => setInputFocused(false)}
+            />
+            <Link href={`/search?term=${searchTerm}`}>
+              <button
+                type="submit"
+                className="p-2 ml-1 mt-4 mb-2 text-sm font-medium text-white rounded-lg border border-white-700 hover:text-teal-500 hover:bg-white  dark:bg-blue-600 dark:hover:bg-blue-700"
+              >
+                <svg
+                  className="w-4"
+                  aria-hidden="true"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"
+                  />
+                </svg>
+              </button>
+            </Link>
+          </form>
+          {searchTerm && isInputFocused && (
+            <div className="absolute top-full left-0 w-full bg-white rounded z-10 shadow-lg">
+              {searchResults.slice(0, 8).map(
+                (
+                  user,
+                  index // Only take first 8 results
+                ) => (
+                  <Link href={`/search?term=${searchTerm}`} key={index}>
+                    <div className="p-3 border-b last:border-b-0 hover:bg-gray-100 rounded">
+                      {user.name || user.title || user.description}
+                    </div>
+                  </Link>
+                )
+              )}
+              {searchResults.length > 8 && (
+                <Link href={`/search?term=${searchTerm}`}>
+                  <div className="p-3 text-gray-700 hover:bg-gray-100 rounded">
+                    See more results...
+                  </div>
+                </Link>
+              )}
+            </div>
+          )}
+        </div>
 
         <div className="flex items-center">
           {user && (
@@ -139,7 +224,7 @@ function Navbar() {
               <div className="relative inline-block text-left">
                 <button
                   className="flex items-center justify-center text-sm px-2 py-1 leading-none border rounded text-white border-white hover:border-transparent hover:text-teal-500 hover:bg-white lg:mt-0"
-                  onClick={() => setIsOpen(!isOpen)}
+                  onClick={() => setIsSettingsOpen(!isSettingsOpen)}
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -157,7 +242,7 @@ function Navbar() {
                   </svg>
                   {user?.name}
                 </button>
-                {isOpen && (
+                {isSettingsOpen && (
                   <div className="absolute right-0 z-10 mt-1 w-28 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
                       <Link

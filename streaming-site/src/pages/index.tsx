@@ -108,7 +108,7 @@ function Homepage(): JSX.Element {
                     </div>
 
                     <div className="">
-                      <Link href="/streamingroom1">
+                      <Link href="/streamingroom">
                         <div
                           className="relative"
                           style={{ paddingBottom: "56.25%" }}
