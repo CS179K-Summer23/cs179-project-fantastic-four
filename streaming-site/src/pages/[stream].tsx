@@ -1,11 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from 'next/router'
-import { doc, getDoc, getDocs, query, collection, where, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, getDocs, query, collection, where, onSnapshot, addDoc, serverTimestamp, deleteDoc } from "firebase/firestore";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import Player from "../components/player";
-import Link from "next/link";
 import Modal from "react-modal";
 import DonationForm from "../components/donation-form";
 import Chat from '../components/chat';
@@ -13,68 +12,105 @@ import Chat from '../components/chat';
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
 
-
 function StreamingRoom(): JSX.Element {
-  const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
-    []
-  );
-  const inputRef = useRef<HTMLInputElement | null>(null);
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  // const chatContainerRef = useRef<HTMLDivElement | null>(null);
+
+  const [followListLoading, setFollowListLoadingStatus] = useState<boolean>(true);
   const [followedList, setFollowedList] = useState<string[]>([]);
 
   const [streamLoading, setStreamLoading] = useState<boolean>(true)
   const [streamerLoading, setStreamerLoading] = useState<boolean>(true)
   const [stream, setStream] = useState<any>(null)
   const [streamer, setStreamer] = useState<any>(null)
+
+  const [userLoading, setUserLoadingStatus] = useState<boolean>(true)
+  const [user, setUser] = useState<any>(null)
+
   const router = useRouter()
 
-  const handleFollow = () => {
-    const streamer = "StreamerUsername";
+  const handleFollow = async () => {
+    const { db } = getFirebaseApp()
 
-    if (!followedList.includes(streamer)) {
-      setFollowedList([...followedList, streamer]);
+    const streamerUsername = router.query.stream;
+
+    if (!db || !streamerUsername || userLoading) return;
+
+    // user must be logged in to follow/unfolllow a streamer
+    if (!user) {
+      alert('Please login to follow this streamer');
+      return;
     }
-  };
 
+    const streamerQuery = query(collection(db, 'users'), where('name', '==', streamerUsername));
+    const streamerUserId = await getDocs(streamerQuery).then((querySnapshot) => querySnapshot.docs[0].data().id);
 
-  const [user, setUser] = useState<any>(null);
+    // user wants to unfollow the streamer
+    if (followedList.includes(streamerUserId)) {
+      const streamerFollowedRef = collection(db, 'follows');
+      const streamerFollowedQuery = query(streamerFollowedRef, where('followerId', '==', user.uid), where('followingId', '==', streamerUserId));
 
-  const isFollowed = followedList.includes("StreamerUsername");
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  
-    if (inputRef.current) {
-      const inputValue = inputRef.current.value.trim();
-  
-      if (inputValue === "") {
-        alert("Message cannot be empty!");
-      } else {
-        setMessages([
-          ...messages,
-          { text: inputValue, timestamp: new Date() },
-        ]);
-        inputRef.current.value = "";
+      try {
+        await deleteDoc((await getDocs(streamerFollowedQuery)).docs[0].ref);
       }
+      catch (error) {
+        console.error('Error deleting document', error);
+        alert('Error unfollowing streamer');
+      }
+
+      setFollowedList(followedList.filter((followedId) => followedId !== streamerUserId));
+    }
+    // user wants to follow the streamer
+    else {
+      try {
+        await addDoc(collection(db, 'follows'), {
+          followerId: user.uid,
+          followingId: streamerUserId,
+          followTime: serverTimestamp(),
+        })
+      }
+      catch (error) {
+        console.error('Error adding document', error);
+        alert('Error following streamer');
+      }
+
+      setFollowedList([...followedList, streamerUserId]);
     }
   };
-  
+
+  useEffect(() => {
+    const { auth, db } = getFirebaseApp()
+
+    if (!auth || !db) return
+
+    onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        const followedStreamersRef = collection(db, 'follows')
+        const followDocs = await getDocs(query(followedStreamersRef, where('followerId', '==', fbUser.uid)))
+        const userProfile = await getDoc(doc(db, 'users', fbUser.uid)).then((doc) => doc.data())
+
+        setUser({
+          ...userProfile,
+          uid: fbUser.uid,
+        })
+        setFollowedList(followDocs.docs.map((followDoc) => followDoc.data().followingId))
+
+        setFollowListLoadingStatus(false)
+        setUserLoadingStatus(false)
+      }
+      else {
+        setFollowListLoadingStatus(false)
+        setUserLoadingStatus(false)
+      }
+    })
+  }, [])
 
   useEffect(() => {
     (async function() {
       const { db } = getFirebaseApp()
       if (!db) return
-      
+
       const queryUser: any = router.query.stream;
       if (!queryUser) return;
-
-
-      // const streamerDoc = await getDoc(doc(db, "users", queryUser))
-
-      // if (!streamerDoc.exists()) {setStreamerLoading(false); return; }
-
-      // const streamerData = streamerDoc.data();
 
       const streamerQuery = query(
         collection(db, "users"), 
@@ -82,7 +118,7 @@ function StreamingRoom(): JSX.Element {
       );      
       const streamerSnapshot = await getDocs(streamerQuery);
       if (streamerSnapshot.empty) {setStreamerLoading(false); return; }
-      
+
       const streamerData = streamerSnapshot.docs[0].data();
       setStreamer(streamerData)
       setStreamerLoading(false)
@@ -98,7 +134,6 @@ function StreamingRoom(): JSX.Element {
       });
       setStreamLoading(false)
 
-        
       return () => unsubStream();
 
     }())
@@ -107,6 +142,8 @@ function StreamingRoom(): JSX.Element {
   const openDonationModal = () => {
     setModalIsOpen(true);
   };
+
+  const isFollowed = followedList.includes(streamer?.id);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -158,7 +195,7 @@ function StreamingRoom(): JSX.Element {
                   <div className="text-gray-600 text-m pt-2">
                   <button
                       className={`text-center ${
-                        isFollowed ? "bg-gray-600" : "bg-gray-900"
+                       followListLoading ? "bg-gray-900" : isFollowed ? "bg-red-600" : "bg-gray-900"
                       } text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600`}
                       onClick={handleFollow}
                     >
@@ -176,7 +213,7 @@ function StreamingRoom(): JSX.Element {
                           d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                         />
                       </svg>
-                      {isFollowed ? "Following" : "Follow"}
+                      {followListLoading ? "Loading..." : isFollowed ? "Unfollow" : "Follow"}
                     </button>
 
                     <button className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
