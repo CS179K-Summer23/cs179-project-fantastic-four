@@ -158,7 +158,7 @@ function Chat({ streamerId }: { streamerId: number }) {
           {messages.map((message: Message, index: number) => (
             <div key={index} className="mb-2">
               <div className="flex justify-between items-center">
-                <span className="text-gray-600 text-sm">
+                <span className="text-gray-600 text-sm font-bold">
                   {message.username}
                 </span>
                 <span className="text-gray-400 text-xs">
@@ -168,18 +168,18 @@ function Chat({ streamerId }: { streamerId: number }) {
                   )}
                 </span>
                 {
-                  /* only show delete button if user is streamer or original commenter */
+                  // only show delete button if user is streamer or original commenter
                   (userId === message.userId || isStreamer) && (
                     <button
-                      className="text-red-500 text-xs"
+                      className="text-red-500 text-xs hover:text-red-700"
                       onClick={() => deleteChatMessage(message.messageId)}
                     >
-                      Delete
+                      🗑️
                     </button>
                   )
                 }
               </div>
-              <p>{message.text}</p>
+              <p className="text-gray-500">{message.text}</p>
             </div>
           ))}
         </div>
