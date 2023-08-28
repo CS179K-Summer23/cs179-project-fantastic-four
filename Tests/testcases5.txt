@@ -1,0 +1,17 @@
+1. User Story: As a streamer, I want to be able to manage my streaming room.
+
+Test Case: The streamer clicks ban button
+Expect Outcome: The user was banned from the streaming room and the message was deleted
+
+2. User story: As a viewer, I want to be able to follow the streamer’s account and receive a notification when they start streaming. (2 point)
+
+Test Case: Click following list button
+Expect Outcome: Listed all followed streamers
+
+3. User story: As a user, I want to be able to search streamer names/categories/keywords to find someone easily
+
+Test Case: Type text in the search bar
+Expect Outcome: List all related streamer names/categories/keywords on the bottom of the search bar.
+
+Test Case: Click the search button
+Expect Outcome: Go to the search  page and list all related streamer names/categories/keywords in different layouts
