@@ -315,7 +315,7 @@ function Settingpage(): JSX.Element {
         </div>
       </main>
 
-      <Footer></Footer>
+      <Footer/>
     </div>
   );
 }

@@ -7,16 +7,13 @@ import {
   getDocs,
   collection,
   Firestore,
+  query,
+  where,
 } from "firebase/firestore";
 import { getFirebaseApp } from "../utils/firebase.config";
 import { signOut } from "firebase/auth";
 
 function Navbar() {
-  interface Account {
-    id: any;
-    name: string;
-  }
-
   const [isMenuOpen, setIsMenuOpen] = useState(false); // For side menu
   const [isSettingsOpen, setIsSettingsOpen] = useState(false); // For settings drop-down
   const [user, setUser] = useState<any>(null);
@@ -36,25 +33,29 @@ function Navbar() {
 
     const searchInCollection = async (colName: string, fields: string[]) => {
       const collectionRef = collection(db, colName);
-      const snapshot = await getDocs(collectionRef);
+      const snapshot = await getDocs(collectionRef); // No source option
       return snapshot.docs
-        .map((doc) => ({ ...doc.data(), id: doc.id }))
+        .map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...fields.reduce((acc: any, field: string) => {
+              acc[field] = data[field];
+              return acc;
+            }, {}),
+          };
+        })
         .filter((doc: any) =>
           fields.some((field) => doc[field]?.includes(searchTerm))
         );
     };
 
     const accountResults = await searchInCollection("accounts", ["name"]);
-    const streamResults = await searchInCollection("streams", [
-      "title",
-      "description",
-    ]);
-    const categoryResults = await searchInCollection("categories", ["name"]);
+    const streamResults = await searchInCollection("streams", ["title"]);
 
     const combinedResults = [
       ...accountResults.map((r) => ({ ...r, type: "Account" })),
       ...streamResults.map((r) => ({ ...r, type: "Stream" })),
-      ...categoryResults.map((r) => ({ ...r, type: "Category" })),
     ];
 
     setSearchResults(combinedResults);

@@ -52,20 +52,20 @@ function StreamingRoom(): JSX.Element {
 
   const isFollowed = followedList.includes("StreamerUsername");
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  // const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  //   e.preventDefault();
 
-    if (inputRef.current) {
-      const inputValue = inputRef.current.value.trim();
+  //   if (inputRef.current) {
+  //     const inputValue = inputRef.current.value.trim();
 
-      if (inputValue === "") {
-        alert("Message cannot be empty!");
-      } else {
-        setMessages([...messages, { text: inputValue, timestamp: new Date() }]);
-        inputRef.current.value = "";
-      }
-    }
-  };
+  //     if (inputValue === "") {
+  //       alert("Message cannot be empty!");
+  //     } else {
+  //       setMessages([...messages, { text: inputValue, timestamp: new Date() }]);
+  //       inputRef.current.value = "";
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     (async function () {
