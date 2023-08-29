@@ -29,7 +29,7 @@ function Chat({ streamerId }: { streamerId: number }) {
   const [isAdmin, setAdminStatus] = useState(false)
   const [isLoadingUser, setLoadingUser] = useState<boolean>(true)
   const [isBannedFromStream, setBannedFromStream] = useState<boolean>(false)
-  const isBannedSnapshotRef = useRef<Unsubscribe>();
+  const unsubIsBannedRef = useRef<Unsubscribe>();
 
 
   useEffect(() => {
@@ -37,7 +37,7 @@ function Chat({ streamerId }: { streamerId: number }) {
 
     if (!db) return
     if (!streamerId) return
-    const unsubscribe = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId),  where('deleted', '==', false), orderBy('timestamp', 'asc')), async ({ docs }) => {
+    const unsubChat = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId),  where('deleted', '==', false), orderBy('timestamp', 'asc')), async ({ docs }) => {
       if (docs.length === 0) {
         setMessages([])
         return
@@ -103,8 +103,7 @@ function Chat({ streamerId }: { streamerId: number }) {
                 where("userId", "==", userId),
                 where("streamerId", "==", streamerId)
               )
-
-              isBannedSnapshotRef.current = onSnapshot(bannedQuery, async ({docs}) => {
+              unsubIsBannedRef.current = onSnapshot(bannedQuery, async ({docs}) => {
                 if (docs.length === 0) {setBannedFromStream(false);}
                 else {setBannedFromStream(true);}
                 return
@@ -137,8 +136,8 @@ function Chat({ streamerId }: { streamerId: number }) {
       }
     })
     return () => {
-      isBannedSnapshotRef.current && isBannedSnapshotRef.current();
-      unsubscribe();
+      unsubIsBannedRef.current && unsubIsBannedRef.current();
+      unsubChat();
     }
 
   }, [streamerId, user])

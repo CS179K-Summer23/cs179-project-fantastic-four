@@ -10,23 +10,21 @@ import Modal from "react-modal";
 import DonationForm from "../components/donation-form";
 import Chat from '../components/chat';
 
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, Unsubscribe } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
 
 
-function StreamingRoom(): JSX.Element {
-  const [messages, setMessages] = useState<{ text: string; timestamp: Date }[]>(
-    []
-  );
-  const inputRef = useRef<HTMLInputElement | null>(null);
+function StreamingRoom(): JSX.Element { 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   // const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [followedList, setFollowedList] = useState<string[]>([]);
 
   const [streamLoading, setStreamLoading] = useState<boolean>(true)
+  const [isStreamerBanned, setStreamerBanned] = useState<boolean>(true)
   const [streamerLoading, setStreamerLoading] = useState<boolean>(true)
   const [stream, setStream] = useState<any>(null)
   const [streamer, setStreamer] = useState<any>(null)
+  const unsubStreamRef = useRef<Unsubscribe>();
   const router = useRouter()
 
   const handleFollow = () => {
@@ -37,29 +35,9 @@ function StreamingRoom(): JSX.Element {
     }
   };
 
-
   const [user, setUser] = useState<any>(null);
 
   const isFollowed = followedList.includes("StreamerUsername");
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-  
-    if (inputRef.current) {
-      const inputValue = inputRef.current.value.trim();
-  
-      if (inputValue === "") {
-        alert("Message cannot be empty!");
-      } else {
-        setMessages([
-          ...messages,
-          { text: inputValue, timestamp: new Date() },
-        ]);
-        inputRef.current.value = "";
-      }
-    }
-  };
-  
 
   useEffect(() => {
     (async function() {
@@ -69,37 +47,42 @@ function StreamingRoom(): JSX.Element {
       const queryUser: any = router.query.stream;
       if (!queryUser) return;
 
-
-      // const streamerDoc = await getDoc(doc(db, "users", queryUser))
-
-      // if (!streamerDoc.exists()) {setStreamerLoading(false); return; }
-
-      // const streamerData = streamerDoc.data();
-
       const streamerQuery = query(
         collection(db, "users"), 
         where("name", "==", queryUser)
       );      
-      const streamerSnapshot = await getDocs(streamerQuery);
-      if (streamerSnapshot.empty) {setStreamerLoading(false); return; }
       
-      const streamerData = streamerSnapshot.docs[0].data();
-      setStreamer(streamerData)
-      setStreamerLoading(false)
-      
-      if (!(streamerData['stream_id'])) {setStreamLoading(false); return; }
-      
-      const streamRef = doc(db, 'streams', streamerData['stream_id']);
-      const unsubStream = onSnapshot(streamRef, async (streamSnap) => {
+      const unsubStreamer = onSnapshot(streamerQuery, async (streamerSnap) => {
+        if (streamerSnap.empty) {setStreamerLoading(false); return; }
 
-        if (streamSnap.exists()) {
-          setStream(streamSnap.data())
-        }
-      });
-      setStreamLoading(false)
-
+        const streamerData = streamerSnap.docs[0].data();
+        setStreamer(streamerData)
         
-      return () => unsubStream();
+        if (streamerData['banned']) {
+          setStreamerBanned(true); 
+          setStreamerLoading(false); 
+          setStreamLoading(false);
+          return; 
+        }
+        setStreamerLoading(false)
+        
+        if (!(streamerData['stream_id'])) {setStreamLoading(false); return; }
+
+        const streamRef = doc(db, 'streams', streamerData['stream_id']);
+        unsubStreamRef.current = onSnapshot(streamRef, async (streamSnap) => {
+  
+          if (streamSnap.exists() && !streamSnap.data()['end_time']) {
+            setStream(streamSnap.data())
+          }
+          else setStream(null)
+          setStreamLoading(false)
+        });
+      });
+      
+      return () => {
+        unsubStreamer();
+        unsubStreamRef.current && unsubStreamRef.current();
+      }
 
     }())
   }, [router])
@@ -147,7 +130,7 @@ function StreamingRoom(): JSX.Element {
                   )
                 }
               </div>
-              <div className="mt-2">
+              {!streamerLoading && streamer && (<div className="mt-2">
                 <img
                   src="https://cdn-icons-png.flaticon.com/512/149/149071.png?w=740&t=st=1691147917~exp=1691148517~hmac=eb6166a62265ce27b7afac68d87a03b748bc37c5361e49e55c8ced8a2f60e2db"
                   className="mt-2 w-7 h-7 rounded-full float-left mr-2"
@@ -200,10 +183,9 @@ function StreamingRoom(): JSX.Element {
                       onClick={openDonationModal} // Open the modal on click
                       className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
                     >
-                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 inline-block mr-1">
-  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-</svg>
-
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 inline-block mr-1">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                       Donate
                     </button>
 
@@ -232,6 +214,7 @@ function StreamingRoom(): JSX.Element {
                   <p className="text-gray-700 text-base">
                     {streamer?.name}
                   </p>
+                  {stream && (
                   <span className="flex text-gray-600 text-m pr-6 pt-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -248,12 +231,12 @@ function StreamingRoom(): JSX.Element {
                       />
                     </svg>
                     {stream?.view_count}
-                  </span>
+                  </span>)}
                 </div>
-              </div>
+              </div>)}
             </div>
           </section>
-          <Chat streamerId={streamer?.id} />
+          {!streamerLoading && streamer && (<Chat streamerId={streamer?.id} />)}
         </div>
       </div>
 
