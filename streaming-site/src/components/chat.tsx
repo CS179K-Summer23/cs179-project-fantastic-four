@@ -23,6 +23,7 @@ function Chat({ streamerId }: { streamerId: number }) {
   const [user, setUser] = useState<any>(null)
   const [userId, setUserId] = useState<any>(null)
   const [messages, setMessages] = useState<any>([])
+  const [chatters, setChatters] = useState<any>({})
   const [isStreamer, setStreamerStatus] = useState(false)
   const [isMod, setModStatus] = useState(false)
   const [isAdmin, setAdminStatus] = useState(false)
@@ -41,22 +42,49 @@ function Chat({ streamerId }: { streamerId: number }) {
         setMessages([])
         return
       }
+      let chatters_ = chatters;
 
-      setMessages(await Promise.all(docs.map(async (chatMessage) => {
-        // need to cache users to reduce db requests if they have multiple messages
-        // userId -> username
-        const userSnap = await getDoc(doc(db, 'users', '' + chatMessage.data().userId))
+      let resultMessages: any = [];
 
-        return {
+      for (const chatMessage of docs) {
+        let userData = chatters_[chatMessage.data().userId]
+
+        if (!userData) {
+          const userSnap = await getDoc(doc(db, 'users', '' + chatMessage.data().userId))
+
+          const adminSnap = await getDoc(doc(db, "admins", '' + chatMessage.data().userId))
+
+          const modQuery = query(
+            collection(db, "mods"),
+            where("modId", "==", chatMessage.data().userId),
+            where("streamerId", "==", streamerId)
+          )
+
+          const modSnap = await getDocs(modQuery);
+
+          userData = {
+            name: userSnap?.data()?.name || 'Anonymous',
+            isAdmin: adminSnap.exists(),
+            isMod: !modSnap.empty
+          } 
+          chatters_[chatMessage.data().userId] = userData
+        }
+
+        const res =  {
           text: chatMessage.data().text,
-          username: userSnap?.data()?.name || 'Anonymous',
+          username: userData.name,
           timestamp: chatMessage.data().timestamp,
           streamerId: chatMessage.data().streamerId,
           messageId: chatMessage.id,
           userId: chatMessage.data().userId,
           deleted: chatMessage.data()?.deleted || false,
         } as unknown as Message
-      })))
+
+        resultMessages.push(res)
+      }
+
+      setMessages(resultMessages)
+      setChatters(chatters_)
     })
 
     onAuthStateChanged(auth, async (firebaseUser) => {
@@ -223,11 +251,17 @@ function Chat({ streamerId }: { streamerId: number }) {
                 <span className="text-gray-400 text-xs pr-2">
                   {formatTimestamp(message.timestamp && new Date(message.timestamp.seconds * 1000))}
                 </span>
-                <span className="text-gray-600 text-sm mr-auto font-semibold">{message.username}</span>
+                <span className="text-gray-600 text-sm font-semibold">{message.username}</span>
+                {(streamerId == message.userId) && 
+                 (<img alt="Streamer" className="pl-2" src="streamer.png"></img>)}
+                {!(streamerId == message.userId) && chatters[message.userId]?.isAdmin && 
+                 (<img alt="Admin" className="pl-2" src="admin.png"></img>)}
+                {!(streamerId == message.userId) && !chatters[message.userId]?.isAdmin && chatters[message.userId]?.isMod && 
+                 (<img alt="Mod" className="pl-2" src="mod.png"></img>)}
                 {
-                  (isStreamer || isAdmin || isMod) && (
+                  (!(userId === message.userId) && (isStreamer || isAdmin || isMod)) && (
                     <button
-                      className="text-red-800 text-xs pr-1"
+                      className="text-red-800 text-xs pr-1 ml-auto"
                       onClick={() => banMessageAuthor(message.userId)}
                     >
                       Ban
@@ -238,7 +272,7 @@ function Chat({ streamerId }: { streamerId: number }) {
                   /* only show delete button if user is streamer, admin, mod, or original commenter */
                   ((userId === message.userId) || isStreamer || isAdmin || isMod) && (
                     <button
-                      className="text-red-500 text-xs"
+                      className={"text-red-500 text-xs" + ((userId === message.userId) ? " ml-auto" : "") }
                       onClick={() => deleteChatMessage(message.messageId)}
                     >
                       Delete
@@ -284,8 +318,14 @@ function Chat({ streamerId }: { streamerId: number }) {
               messageInput.value = ""
               messageInput.focus()
             }}>
-              <input
-              className="w-full rounded-l-lg p-2 border-2 border-gray-900"
+            {isStreamer && 
+            (<img alt="Streamer" className="absolute mt-3 ml-2 h-5" draggable="false" src="streamer.png"></img>)}
+            {!isStreamer && isAdmin && 
+            (<img alt="Admin" className="absolute mt-3 ml-2 h-5" draggable="false" src="admin.png"></img>)}
+            {!isStreamer && !isAdmin && isMod && 
+            (<img alt="Mod" className="absolute mt-3 ml-2 h-5" draggable="false" src="mod.png"></img>)}
+            <input
+              className="w-full rounded-l-lg pl-8 p-2 border-2 border-gray-900"
               type="text"
               id="text"
               placeholder="Write a message..."
