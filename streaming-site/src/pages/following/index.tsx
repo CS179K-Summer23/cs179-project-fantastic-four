@@ -2,10 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
 import Player from "../../components/player";
-import { string, bool, number } from "prop-types";
-
 import Link from "next/link";
-
 import {
   QuerySnapshot,
   collection,

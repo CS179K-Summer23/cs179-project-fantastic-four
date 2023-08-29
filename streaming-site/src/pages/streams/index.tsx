@@ -41,6 +41,8 @@ function Streams(): JSX.Element {
 
   const [streams, setStreams] = useState<any>(null);
   const [streamers, setStreamers] = useState<Streamer[]>([]);
+  const [activeTab, setActiveTab] = useState('liveChannels'); // Initialize with the Live Channels tab
+
 
   useEffect(() => {
     const { auth, db } = getFirebaseApp();
@@ -102,7 +104,21 @@ function Streams(): JSX.Element {
       <Navbar></Navbar>
       <main className="flex-1">
         <div className="container mx-auto p-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+        <button
+              className={`px-4 py-2 ${activeTab === 'liveChannels' ? 'bg-blue-500 text-white' : ''}`}
+              onClick={() => setActiveTab('liveChannels')}
+            >
+              Live Channels
+            </button>
+            <button
+              className={`px-4 py-2 ${activeTab === 'categories' ? 'bg-blue-500 text-white' : ''}`}
+              onClick={() => setActiveTab('categories')}
+            >
+              Categories
+            </button>
+            {activeTab === 'liveChannels' && (
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4">
             {streams &&
               streams.map((stream: Stream, i: number) => (
                 <div
@@ -149,7 +165,7 @@ function Streams(): JSX.Element {
                         alt="Streamer avatar"
                       />
                       <div className="pl-9">
-                        <h3 className="font-bold text-xl hover:text-gray-500">
+                      <h3 className="font-bold text-xl hover:text-gray-500 pt-1">
                           <Link href={"/" + streamers[i].name}>
                             {stream.title}
                           </Link>
@@ -185,6 +201,7 @@ function Streams(): JSX.Element {
                 </div>
               ))}
           </div>
+          )}
         </div>
       </main>
       <Footer></Footer>

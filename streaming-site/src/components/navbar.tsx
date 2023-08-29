@@ -20,6 +20,7 @@ function Navbar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isInputFocused, setInputFocused] = useState(false);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const handleSearch = async (
     db: Firestore,
@@ -46,19 +47,39 @@ function Navbar() {
           };
         })
         .filter((doc: any) =>
-          fields.some((field) => doc[field]?.includes(searchTerm))
+          fields.some((field) =>
+            doc[field]?.toLowerCase().includes(searchTerm.toLowerCase())
+          )
         );
     };
 
     const accountResults = await searchInCollection("accounts", ["name"]);
-    const streamResults = await searchInCollection("streams", ["title"]);
+    const streamResults = await searchInCollection("streams", [
+      "title",
+      "category",
+    ]);
 
     const combinedResults = [
       ...accountResults.map((r) => ({ ...r, type: "Account" })),
       ...streamResults.map((r) => ({ ...r, type: "Stream" })),
     ];
 
-    setSearchResults(combinedResults);
+    // Deduplicate categories
+    const uniqueCategories: any[] = [];
+    streamResults.forEach((result: any) => {
+      if (
+        result.category &&
+        !uniqueCategories.find((cat) => cat.name === result.category)
+      ) {
+        uniqueCategories.push({
+          id: uniqueCategories.length + 1,
+          name: result.category,
+          type: "Category",
+        });
+      }
+    });
+
+    setSearchResults([...combinedResults, ...uniqueCategories]);
   };
 
   useEffect(() => {
@@ -87,6 +108,14 @@ function Navbar() {
 
     handleSearch(db, searchTerm, setSearchResults);
   }, [searchTerm]);
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [isDarkMode]);
 
   return (
     <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 py-1">
@@ -151,7 +180,7 @@ function Navbar() {
             <Link href={`/search?term=${searchTerm}`}>
               <button
                 type="submit"
-                className="p-2 ml-1 mt-4 mb-2 text-sm font-medium text-white rounded-lg border border-white-700 hover:text-teal-500 hover:bg-white  dark:bg-blue-600 dark:hover:bg-blue-700"
+                className="p-2 ml-1 mt-4 mb-2 text-sm font-medium text-white rounded border border-white-700 hover:text-teal-500 hover:bg-white  dark:bg-blue-600 dark:hover:bg-blue-700"
               >
                 <svg
                   className="w-4"
@@ -252,6 +281,7 @@ function Navbar() {
                       >
                         Settings
                       </Link>
+                      
                       <button
                         className="text-gray-700 block px-4 py-2 text-sm"
                         onClick={async () => {
