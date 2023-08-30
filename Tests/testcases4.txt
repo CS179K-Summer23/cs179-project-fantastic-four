@@ -1,0 +1,21 @@
+1. User Story: As a user, I want to be able to search users/streamers/streaming room.
+
+Test Case: Enter text in the search bar
+Expect Outcome: Display related options
+
+Test Case: Click search button
+Expect Outcome: Go to the new page /search and display all related accounts
+
+2. User story: As a viewer, I want to be able to follow the streamer’s account and receive a notification when they start streaming. (2 point)
+
+Test Case: Click follow button in streaming room
+Expect Outcome: Add streamer to the following list
+
+Test Case: Click unfollow button in streaming room
+Expect Outcome: Remove streamer from the following list
+
+3. User story: As a user/streamer, I want to check the donation history
+
+Test Case: The user click setting page
+Expected Outcome: There is a tab to show all payment history
+

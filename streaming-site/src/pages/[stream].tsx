@@ -13,12 +13,11 @@ import {
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import Player from "../components/player";
-import Link from "next/link";
 import Modal from "react-modal";
 import DonationForm from "../components/donation-form";
 import Chat from "../components/chat";
 import Share from "../components/share";
-
+import Link from "next/link";
 import { onAuthStateChanged } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
 import Follow from "../components/follow";
@@ -28,12 +27,9 @@ function StreamingRoom(): JSX.Element {
     []
   );
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const recaptchaRef = React.createRef();
 
   const [modalIsOpen, setModalIsOpen] = useState(false);
-  // const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [followedList, setFollowedList] = useState<string[]>([]);
-
   const [streamLoading, setStreamLoading] = useState<boolean>(true);
   const [streamerLoading, setStreamerLoading] = useState<boolean>(true);
   const [stream, setStream] = useState<any>(null);
@@ -74,6 +70,7 @@ function StreamingRoom(): JSX.Element {
         collection(db, "users"),
         where("name", "==", queryUser)
       );
+
       const streamerSnapshot = await getDocs(streamerQuery);
       if (streamerSnapshot.empty) {
         setStreamerLoading(false);
@@ -104,6 +101,8 @@ function StreamingRoom(): JSX.Element {
   const openDonationModal = () => {
     setModalIsOpen(true);
   };
+
+  const isFollowed = followedList.includes(streamer?.id);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -241,10 +240,10 @@ function StreamingRoom(): JSX.Element {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center  text-center">
+                <div className="flex justify-between items-center text-center">
                   <p className="text-gray-700">
                     {streamer?.name}
-                    <Link href="/categories">
+                    <Link href={"/categories/" + stream?.category}>
                       <span className="ml-3 hover:bg-gray-400 rounded-lg text-xs p-1 font-bold bg-gray-300">
                         {stream?.category}
                       </span>
