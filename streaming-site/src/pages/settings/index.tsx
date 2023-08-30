@@ -1,8 +1,9 @@
 import React, { useRef, useState, useEffect } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
+import Redirect from 'next/router'
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged, updateEmail  } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { updateDoc } from "firebase/firestore";
 import { getFirebaseApp } from "../../utils/firebase.config";
@@ -13,43 +14,69 @@ function isEmailValid(email: string): boolean {
 }
 
 function Settingpage(): JSX.Element {
-  const [user, setProfile] = useState({
-    name: "",
-    profilePicture: "",
-    email: "",
-    birthday: 0,
-    age: 0,
-    debit: 0,
-    stream_key: "",
-    title: "",
-    description: "",
-  });
+  type UserType = {
+    name: string
+    profilePicture: string
+    email: string
+    birthday: number,
+    age: number,
+    debit: number,
+    stream_key: string
+    title: string
+    description: string
+  }
+  const [user, setProfile] = useState<any>(null);
+  const [userChanges, setProfileChanges] = useState<any>({});
+  const [userPublic, setPublicProfile] = useState<any>(null);
+  const [userPublicChanges, setPublicProfileChanges] = useState<any>({});
 
   useEffect(() => {
     const { auth, db } = getFirebaseApp();
 
-    if (!auth || !db) {
+    if (!auth || !db ) {
       console.error("Firebase not available");
       return;
     }
 
-    onAuthStateChanged(auth, (user) => {
+    const unsubAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         const { uid } = user;
-        const docRef = doc(db, "users", uid);
-
+        const docRef = doc(db, "accounts", uid);
+        
         getDoc(docRef).then((userData) => {
           if (!userData.exists()) {
-            console.error("Firebase Error: User does not exist in firestore");
+            console.error("Firebase Error: User Account does not exist in firestore");
             return;
           }
+          const userId = userData.data()['id']
+          setProfile(userData.data() as UserType);
+          setProfileChanges(userData.data() as UserType);
 
-          setProfile(userData.data() as typeof user);
+          getDoc(doc(db, "users", '' + userId)).then((userPublicData) => {
+            if (!userPublicData.exists()) {
+              console.error("Firebase Error: User User does not exist in firestore");
+              return;
+            }
+  
+            setPublicProfile(userPublicData.data() as typeof user);
+            setPublicProfileChanges(userPublicData.data() as typeof user);
+          });
         });
+
+
       } else {
         console.log("No user signed in");
+        setProfile(null)
+        setProfileChanges(null)
+        setPublicProfile(null)
+        setPublicProfileChanges(null)
+        Redirect.push('/')
       }
     });
+
+    return () => {
+      unsubAuth()
+    }
   }, []);
 
   //upload profile to firebase
@@ -61,14 +88,50 @@ function Settingpage(): JSX.Element {
       return;
     }
 
-    const userRef = doc(db, "users", auth.currentUser.uid);
-    if (!isEmailValid(updatedProfile.email)) {
+    const changes: any = Object.fromEntries(Object.entries(updatedProfile).filter(([k, v]) => user[k] !== v))
+
+    setProfile({...user, ...changes})
+    const accountChanges: any = {}
+    if (changes['name']) {
+      accountChanges['name'] = changes['name']
+    }
+    if (changes['email']) {
+      accountChanges['email'] = changes['email']
+    }
+
+    if (!Object.keys(accountChanges).length) return
+
+    const accountRef = doc(db, "accounts", auth.currentUser.uid);
+    const userRef = doc(db, "users", '' + user.id);
+
+    if (changes['email'] && !isEmailValid(updatedProfile.email)) {
       alert("Please enter a valid email address");
       return;
     }
 
+    // if (changes['name'] && !isNameValid(updatedProfile.name)) {
+    //   alert("Please enter a valid alphanumeric name with 3-10 characters. ");
+    //   return;
+    // }
+
     try {
-      await updateDoc(userRef, updatedProfile);
+      if (changes['name']) {
+        await updateDoc(userRef, {name: changes['name']});
+        await updateDoc(accountRef, {name: changes['name']});
+      }
+
+      if (changes['email']) {
+        try {
+          await updateEmail(auth.currentUser, changes['email'])
+        }
+        catch (error)  {
+          console.log(error)
+          alert('To change your email, Sign In again, then retry.')
+          return Redirect.push('/signin')
+        }
+        await updateDoc(accountRef, {email: changes['email']});
+      }
+
       console.log("Profile updated successfully");
       alert("Profile updated successfully!"); // Displaying an alert
     } catch (error) {
@@ -76,11 +139,46 @@ function Settingpage(): JSX.Element {
     }
   };
 
+  const updateUserPublicProfile = async (updatedProfile: typeof user) => {
+    const { auth, db } = getFirebaseApp();
+
+    if (!auth || !db || !auth.currentUser) {
+      console.error("Firebase not available or user not signed in");
+      return;
+    }
+    const changes: any = Object.fromEntries(Object.entries(updatedProfile).filter(([k, v]) => userPublic[k] !== v))
+    if (!Object.keys(changes).length) return
+
+    setPublicProfile({...userPublic, ...changes})
+    
+    const userRef = doc(db, "users", '' + user.id);
+    
+    try {
+      await updateDoc(userRef, {...changes});
+      if(userPublic.stream_id) {
+        const streamRef = doc(db, "streams", '' + userPublic.stream_id);
+        await updateDoc(streamRef, {...changes});
+      }
+      console.log("Stream info updated successfully");
+      alert("Stream Info updated successfully!"); // Displaying an alert
+    } catch (error) {
+      console.error("Failed to update stream info", error);
+    }
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    setProfile({
-      ...user,
+    setProfileChanges({
+      ...userChanges,
+      [name]: value,
+    });
+  };
+
+  const handlePublicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setPublicProfileChanges({
+      ...userPublicChanges,
       [name]: value,
     });
   };
@@ -90,7 +188,7 @@ function Settingpage(): JSX.Element {
       <Navbar></Navbar>
 
       <main className="flex-1">
-        <div className="container mx-auto px-8 py-6">
+        {user && (<div className="container mx-auto px-8 py-6">
           <h1 className="text-3xl font-bold mb-4">Settings</h1>
           <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
@@ -139,7 +237,7 @@ function Settingpage(): JSX.Element {
                   <input
                     type="text"
                     name="name"
-                    value={user?.name}
+                    value={userChanges?.name}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border"
                   />
@@ -151,7 +249,7 @@ function Settingpage(): JSX.Element {
                   <input
                     type="email"
                     name="email"
-                    value={user?.email}
+                    value={userChanges?.email}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border"
                   />
@@ -163,34 +261,7 @@ function Settingpage(): JSX.Element {
                   <input
                     type="date"
                     name="birthday"
-                    value={user?.birthday}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 rounded border"
-                  />
-                </div>
-
-
-                <div className="col-span-1">
-                  <label htmlFor="Title" className="text-gray-700">
-                    Title
-                  </label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={user?.title}
-                    onChange={handleChange}
-                    className="w-full p-2 mt-1 rounded border"
-                  />
-                </div>
-
-                <div className="col-span-1">
-                  <label htmlFor="Description" className="text-gray-700">
-                    Description
-                  </label>
-                  <input
-                    type="text"
-                    name="description"
-                    value={user?.description}
+                    value={userChanges?.birthday}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border"
                   />
@@ -211,13 +282,13 @@ function Settingpage(): JSX.Element {
                 </div>
 
                 <div className="col-span-1">
-                  <label htmlFor="Streamkey" className="text-gray-700">
+                  <label htmlFor="streamkey" className="text-gray-700">
                     Streamkey
                   </label>
                   <input
                     disabled
                     type="string"
-                    name="Streamkey"
+                    name="streamkey"
                     value={user?.stream_key}
                     onChange={handleChange}
                     className="w-full p-2 mt-1 rounded border cursor-not-allowed"
@@ -238,14 +309,64 @@ function Settingpage(): JSX.Element {
                 </div>
               </div>
               <button
-                onClick={() => updateUserProfile(user)}
+                onClick={() => updateUserProfile(userChanges)}
                 className="float-right bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded mt-4"
               >
                 Submit Changes
               </button>
             </div>
           </section>
-        </div>
+
+          <section>
+          <h2 className="mt-8 text-xl font-bold mb-4">Stream Settings</h2>
+            <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
+              <div className="grid grid-rows-3 gap-4 w-full">
+                <div className="col-span-1">
+                  <label htmlFor="title" className="text-gray-700">
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={userPublicChanges?.title}
+                    onChange={handlePublicChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label htmlFor="description" className="text-gray-700">
+                    Description
+                  </label>
+                  <input
+                    type="text"
+                    name="description"
+                    value={userPublicChanges?.description}
+                    onChange={handlePublicChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <label htmlFor="category" className="text-gray-700">
+                    Category
+                  </label>
+                  <input
+                    type="text"
+                    name="category"
+                    value={userPublicChanges?.category}
+                    onChange={handlePublicChange}
+                    className="w-full p-2 mt-1 rounded border"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={() => updateUserPublicProfile(userPublicChanges)}
+                className="float-right bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded mt-4"
+              >
+                Submit Changes
+              </button>
+            </div>
+          </section>
+        </div>)}
       </main>
 
       <Footer></Footer>

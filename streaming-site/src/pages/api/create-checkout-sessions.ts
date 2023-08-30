@@ -1,3 +1,5 @@
+import { NextApiRequest, NextApiResponse } from "next";
+
 require('dotenv').config();
 
 const express = require('express');
@@ -12,7 +14,7 @@ const donationAmt = new Map([
     [1, { priceInDollars: 100, name: "Donate $100" }]
 ]);
 
-app.post('/create-checkout-session', async (req, res) => {
+app.post('/create-checkout-session', async (req: NextApiRequest, res: NextApiResponse) => {
     res.json({ url: 'testing url' })
 });
 
