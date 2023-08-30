@@ -18,7 +18,7 @@ export async function checkout({ mode, lineItems }: CheckoutParams) {
         return stripePromise;
     }
 
-    const stripe = await getStripe();
+    const stripe: any = await getStripe();
 
     await stripe.redirectToCheckout({
         mode: mode,
