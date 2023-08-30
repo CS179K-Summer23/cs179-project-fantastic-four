@@ -6,13 +6,13 @@ Expected Outcome: The message is shown in the streaming room.
 Test Case: The user send the empty message
 Expected Outcome: Display the notification said you can't send the empty message.
 
-2. User Story: As a user, I want to have a profile page that can customize my profile picture, username, etc. (2 points)
+2. User Story: As a user, I want to have a profile page that can customize my  username, etc. (2 points)
 
 Test Case: The user opens the profile page
-Expected Outcome: Display the page which has options including profile picture, username, birthday, email, and debit.
+Expected Outcome: Display the page that has options including username, birthday, email, and debit.
 
 Test Case: The user submits the form
-Expected Outcome: When everything is correct and unique, upload the information to the server. Otherwise, require the user to change information.
+Expected Outcome: When everything is correct and unique, upload the information to the server. Otherwise, requires the user to change information.
 
 
 3. User Story: As a user, I want to be able to donate to streamers because I want to be able to support the content creators that I am familiar with. (1 point)
