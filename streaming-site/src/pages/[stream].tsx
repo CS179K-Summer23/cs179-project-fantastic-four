@@ -1,11 +1,10 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/router'
-import { doc, getDoc, getDocs, query, collection, where, onSnapshot, updateDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, query, collection, where, onSnapshot, addDoc, serverTimestamp, deleteDoc, updateDoc } from "firebase/firestore";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import Player from "../components/player";
-import Link from "next/link";
 import Modal from "react-modal";
 import DonationForm from "../components/donation-form";
 import Chat from '../components/chat';
@@ -20,12 +19,14 @@ function StreamingRoom(): JSX.Element {
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalManageBansIsOpen, setModalManageBansIsOpen] = useState(false);
   const [modalManageModsIsOpen, setModalManageModsIsOpen] = useState(false);
-  // const chatContainerRef = useRef<HTMLDivElement | null>(null);
+  const [followListLoading, setFollowListLoadingStatus] = useState<boolean>(true);
+
   const [followedList, setFollowedList] = useState<string[]>([]);
 
   const [streamLoading, setStreamLoading] = useState<boolean>(true)
   const [streamerLoading, setStreamerLoading] = useState<boolean>(true)
   const [streamer, setStreamer] = useState<any>(null)
+  const [userLoading, setUserLoadingStatus] = useState<boolean>(true)
   const [stream, setStream] = useState<any>(null)
   const [isStreamerBanned, setStreamerBanned] = useState<boolean>(false)
   const [isLoadingUser, setLoadingUser] = useState<boolean>(true)
@@ -38,36 +39,76 @@ function StreamingRoom(): JSX.Element {
   const unsubStreamRef = useRef<Unsubscribe>();
   const router = useRouter()
 
-  const handleFollow = () => {
-    const streamer = "StreamerUsername";
+  const handleFollow = async () => {
+    const { db } = getFirebaseApp()
 
-    if (!followedList.includes(streamer)) {
-      setFollowedList([...followedList, streamer]);
-    }
-  };
+    const streamerUsername = router.query.stream;
 
-  const handleBan = async () => {
-    const { auth, db } = getFirebaseApp();
+    if (!db || !streamerUsername || userLoading) return;
 
-    if (!auth || !db || !auth.currentUser) {
-      console.error("Firebase not available or user not signed in");
+    // user must be logged in to follow/unfolllow a streamer
+    if (!user) {
+      alert('Please login to follow this streamer');
       return;
     }
 
-    if (!isAdmin) return
+    const streamerQuery = query(collection(db, 'users'), where('name', '==', streamerUsername));
+    const streamerUserId = await getDocs(streamerQuery).then((querySnapshot) => querySnapshot.docs[0].data().id);
 
-    const accountQuery = query(
-      collection(db, "accounts"),
-      where("id", "==", streamer.id)
-    )
+    // user wants to unfollow the streamer
+    if (followedList.includes(streamerUserId)) {
+      const streamerFollowedRef = collection(db, 'follows');
+      const streamerFollowedQuery = query(streamerFollowedRef, where('followerId', '==', user.uid), where('followingId', '==', streamerUserId));
 
-    const userRef = doc(db, "users", '' + streamer.id);
+      try {
+        await deleteDoc((await getDocs(streamerFollowedQuery)).docs[0].ref);
+      }
+      catch (error) {
+        console.error('Error deleting document', error);
+        alert('Error unfollowing streamer');
+      }
 
-    const accountSnap = await getDocs(accountQuery);
+      setFollowedList(followedList.filter((followedId) => followedId !== streamerUserId));
+    }
+    // user wants to follow the streamer
+    else {
+      try {
+        await addDoc(collection(db, 'follows'), {
+          followerId: user.uid,
+          followingId: streamerUserId,
+          followTime: serverTimestamp(),
+        })
+      }
+      catch (error) {
+        console.error('Error adding document', error);
+        alert('Error following streamer');
+      }
 
-    if(accountSnap.empty) {
-      console.log('ban error: streamer account not found in firestore')
-      return
+      setFollowedList([...followedList, streamerUserId]);
+    }
+  };
+const handleBan = async () => {
+  const { auth, db } = getFirebaseApp();
+
+  if (!auth || !db || !auth.currentUser) {
+    console.error("Firebase not available or user not signed in");
+    return;
+  }
+
+  if (!isAdmin) return
+
+  const accountQuery = query(
+    collection(db, "accounts"),
+    where("id", "==", streamer.id)
+  )
+
+  const userRef = doc(db, "users", '' + streamer.id);
+
+  const accountSnap = await getDocs(accountQuery);
+
+  if(accountSnap.empty) {
+    console.log('ban error: streamer account not found in firestore')
+    return
     }
     const accountRef = accountSnap.docs[0].ref;
 
@@ -80,13 +121,38 @@ function StreamingRoom(): JSX.Element {
     setStreamerBanned(!isStreamerBanned)
   };
 
-  const isFollowed = followedList.includes("StreamerUsername");
+  useEffect(() => {
+    const { auth, db } = getFirebaseApp()
+
+    if (!auth || !db) return
+
+    onAuthStateChanged(auth, async (fbUser) => {
+      if (fbUser) {
+        const followedStreamersRef = collection(db, 'follows')
+        const followDocs = await getDocs(query(followedStreamersRef, where('followerId', '==', fbUser.uid)))
+        const userProfile = await getDoc(doc(db, 'users', fbUser.uid)).then((doc) => doc.data())
+
+        setUser({
+          ...userProfile,
+          uid: fbUser.uid,
+        })
+        setFollowedList(followDocs.docs.map((followDoc) => followDoc.data().followingId))
+
+        setFollowListLoadingStatus(false)
+        setUserLoadingStatus(false)
+      }
+      else {
+        setFollowListLoadingStatus(false)
+        setUserLoadingStatus(false)
+      }
+    })
+  }, [])
 
   useEffect(() => {
     (async function() {
       const { db, auth } = getFirebaseApp()
       if (!db) return
-      
+
       const queryUser: any = router.query.stream;
       if (!queryUser) return;
 
@@ -177,6 +243,8 @@ function StreamingRoom(): JSX.Element {
   const openDonationModal = () => {
     setModalIsOpen(true);
   };
+
+  const isFollowed = followedList.includes(streamer?.id);
 
   const openManageBansModal = () => {
     setModalManageBansIsOpen(true);
@@ -371,9 +439,7 @@ function StreamingRoom(): JSX.Element {
                     !streamerLoading && streamer &&
                     !isStreamerBanned &&
                      !(streamer.id == userId) && (<button
-                      className={`text-center ${
-                        isFollowed ? "bg-gray-600" : "bg-gray-900"
-                      } text-white font-bold rounded-lg ml-1 px-2 py-1 hover:bg-gray-600`}
+                      className={`ml-1 text-center text-white font-bold rounded-lg px-2 py-1 ${followListLoading ? "bg-gray-600" : isFollowed ? "bg-gray-900" : "bg-gray-800"} hover:bg-gray-600`}
                       onClick={handleFollow}
                     >
                       <svg
@@ -390,12 +456,11 @@ function StreamingRoom(): JSX.Element {
                           d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
                         />
                       </svg>
-                      {isFollowed ? "Following" : "Follow"}
+                      {followListLoading ? "Loading..." : isFollowed ? "Following" : "Follow"}
                     </button>)}
 
                     {!streamerLoading && streamer &&
-                    !isStreamerBanned &&
-                    (<button className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
+                    !isStreamerBanned && (<button className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
