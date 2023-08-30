@@ -19,6 +19,7 @@ function CategoryLists(): JSX.Element {
   const [categoryLoading, setCategoryLoading] = useState<boolean>(true);
   const [stream, setLivestream] = useState<any[]>([]);
   const [streamLoading, setStreamLoading] = useState<boolean>(true);
+  const [streamName, setStreamerName] = useState<any[]>([]);
 
   const router = useRouter();
   const queryCategory: any = router.query.category;
@@ -60,21 +61,24 @@ function CategoryLists(): JSX.Element {
 
               const streamerSnapshot = await getDocs(
                 query(
-                  collection(db, "accounts"),
+                  collection(db, "users"),
                   where("id", "==", streamData.streamer_id)
                 )
               );
 
               if (!streamerSnapshot.empty) {
                 streamerNames.push(streamerSnapshot.docs[0].data().name);
-                console.log(streamerSnapshot.docs[0].data().name);
+                // setStreamerName(streamName);
+                // console.log(setStreamerName(streamName));
+
+                // console.log(streamerNames);
               }
             }
           });
 
           setLivestream(streamsData);
-          // You could save the streamerNames in state, or do something else with them here
-          console.log(streamerNames);
+          setStreamerName(streamerNames);
+          console.log(streamName);
           setStreamLoading(false);
         });
 
@@ -124,8 +128,10 @@ function CategoryLists(): JSX.Element {
                       </div>
 
                       <div className="flex justify-between items-center text-center">
-                        <p className="text-gray-700">{stream[index]}</p>{" "}
-                        {/* Display the account name here */}
+                        <p className="text-gray-700">{stream[index]}</p>
+                        <span className="text-gray-500">
+                          {streamName[stream[index]]}
+                        </span>{" "}
                         <span className="flex text-gray-600 text-m pt-2">
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
