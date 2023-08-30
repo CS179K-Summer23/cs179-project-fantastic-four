@@ -20,10 +20,16 @@ Expect Outcome: Go to the search  page and list all related streamer names/categ
 4. User story: As a user, I want to be able to see the most popular streams on the homepage
 
 Test Case: Open the homepage
-Expect Outcome: Display the most popular 3 live streams.
+Expect Outcome: Display the most popular 3 live streams at the top.
 
-Test Case: CLick prev and next buttons
-Expect Outcome: Display each stream and loop in index of 3
+Test Case: Move the mouse to the player
+Expect Outcome: Display the information of the streaming including streamer name/category/viewer count.
+
+Test Case: Click prev and next buttons
+Expect Outcome: Display each stream and loop in the index of 3
+
+Test Case: Click the player
+Expect Outcome: Go the the streaming room with matched streamer name
 
 Test Case: There are not any live streams
 Expect Outcome: Display nothing
