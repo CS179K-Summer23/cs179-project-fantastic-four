@@ -187,7 +187,7 @@ function Searchpage(): JSX.Element {
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                         {limitedResults.map((category) => (
                           <div key={category.id}>
-                            <Link href="/categories">
+                            <Link href={"/categories/" + category.name}>
                               <div className="rounded overflow-hidden shadow-lg p-4 bg-white hover:bg-gray-500 hover:text-white cursor-pointer">
                                 {category.name}
                               </div>
