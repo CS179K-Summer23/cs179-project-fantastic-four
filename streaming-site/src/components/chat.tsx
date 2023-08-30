@@ -249,7 +249,7 @@ function Chat({ streamerId }: { streamerId: number }) {
         <div className="chat-container flex flex-col-reverse p-2 m-0 h-full overflow-y-scroll">
           {messages.map((message: Message, index: number) => (
             (!message.deleted) &&
-            <div key={index} className="mb-2">
+            <div key={index} className="mb-4">
               <div className="flex items-center">
                 <span className="text-gray-400 text-sm pr-2">
                   {formatTimestamp(message.timestamp && new Date(message.timestamp.seconds * 1000))}
@@ -291,7 +291,7 @@ function Chat({ streamerId }: { streamerId: number }) {
 
 
         { (!isLoadingUser && user && !isBannedFromStream) && (
-          <div className="h-1/5 my-4 bg-white relative">
+          <div className="h-1/5 mt-4 mb-2 pb-2 bg-white relative">
             <form className="flex absolute bottom-0 w-full" onSubmit={async (e) => {
               e.preventDefault()
       
