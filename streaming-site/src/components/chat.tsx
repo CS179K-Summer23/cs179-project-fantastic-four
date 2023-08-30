@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react'
 import { query, doc, where, orderBy, onSnapshot, collection, addDoc, getDoc, serverTimestamp, deleteDoc, getDocs, QuerySnapshot, updateDoc } from 'firebase/firestore'
 import { Unsubscribe, onAuthStateChanged } from 'firebase/auth'
 import { getFirebaseApp } from '../utils/firebase.config'
-import { setUserId } from 'firebase/analytics'
 
 type Timestamp = {
   seconds: number
@@ -87,7 +86,7 @@ function Chat({ streamerId }: { streamerId: number }) {
       setChatters(chatters_)
     })
 
-    onAuthStateChanged(auth, async (firebaseUser) => {
+    const unsubAuth = onAuthStateChanged(auth, async (firebaseUser) => {
       if (firebaseUser) {
         setUser(firebaseUser)
         await getDoc(doc(db, 'accounts', firebaseUser.uid))
@@ -132,15 +131,20 @@ function Chat({ streamerId }: { streamerId: number }) {
         })
       } else {
         setUser(null)
+        setUserId(null)
+        setStreamerStatus(false)
+        setModStatus(false)
+        setAdminStatus(false)
         setLoadingUser(false)
       }
     })
     return () => {
+      unsubAuth();
       unsubIsBannedRef.current && unsubIsBannedRef.current();
       unsubChat();
     }
 
-  }, [streamerId, user])
+  }, [streamerId, user, chatters])
 
   const formatTimestamp = (timestamp: Date) => {
     const options: Intl.DateTimeFormatOptions = {
@@ -230,7 +234,7 @@ function Chat({ streamerId }: { streamerId: number }) {
         setStreamerStatus(true)
       }
     }())
-  }, [db, auth, streamerId])
+  }, [db, auth, streamerId, userId])
 
 
   return (
@@ -305,6 +309,10 @@ function Chat({ streamerId }: { streamerId: number }) {
       
               if (message === "") return
       
+              // clear input
+              messageInput.value = ""
+              messageInput.focus()
+              
               await addDoc(collection(db, 'chat'), {
                 text: message,
                 userId,
@@ -313,9 +321,6 @@ function Chat({ streamerId }: { streamerId: number }) {
                 deleted: false
               })
       
-              // clear input
-              messageInput.value = ""
-              messageInput.focus()
             }}>
             {isStreamer && 
             (<img alt="Streamer" className="absolute mt-3 ml-2 h-5" draggable="false" src="streamer.png"></img>)}
