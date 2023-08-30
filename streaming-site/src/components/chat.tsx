@@ -55,12 +55,12 @@ function Chat({ streamerId }: { streamerId: number }) {
           .then((data) => {
             if (data.exists()) {
               const userId = data.data()['id']
-              setUserId(userId) 
+              setUserId(userId)
               setStreamerStatus(userId === streamerId)
             }
 
-        })
-        
+          })
+
       } else {
         setUser(null)
       }
@@ -126,14 +126,14 @@ function Chat({ streamerId }: { streamerId: number }) {
 
   return (
     <section
-      className="flex flex-col justify-between w-full h-full overflow-scroll md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
+      className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg h-1/3"
       style={{ maxWidth: "350px" }}
     >
-      <div className="bg-white">
+      <div className="bg-white h-4/5">
         <h2 className="font-bold text-center border-b-2 text-m pb-1">
           STREAM CHAT
         </h2>
-        <div className="chat-container p-2 m-0 overflow-y-auto">
+        <div className="chat-container flex flex-col-reverse p-2 m-0 h-full overflow-y-scroll">
           {messages.map((message: Message, index: number) => (
             <div key={index} className="mb-2">
               <div className="flex justify-between items-center">
@@ -159,48 +159,50 @@ function Chat({ streamerId }: { streamerId: number }) {
         </div>
       </div>
 
-      <form className="my-4 flex bg-white m" onSubmit={async (e) => {
-        e.preventDefault()
+      <div className="h-1/5 my-4 bg-white relative">
+        <form className="flex absolute bottom-0 w-full" onSubmit={async (e) => {
+          e.preventDefault()
 
-        if (!db) {
-          alert('Error submitting message')
-          return
-        }
+          if (!db) {
+            alert('Error submitting message')
+            return
+          }
 
-        if (!user) {
-          alert('Please sign in to chat')
-          return
-        }
+          if (!user) {
+            alert('Please sign in to chat')
+            return
+          }
 
-        const messageInput = document.getElementById('text') as HTMLInputElement
-        const message = messageInput.value.trim()
+          const messageInput = document.getElementById('text') as HTMLInputElement
+          const message = messageInput.value.trim()
 
-        if (message === "") return
+          if (message === "") return
 
-        await addDoc(collection(db, 'chat'), {
-          text: message,
-          userId,
-          timestamp: serverTimestamp(),
-          streamerId,
-        })
+          await addDoc(collection(db, 'chat'), {
+            text: message,
+            userId,
+            timestamp: serverTimestamp(),
+            streamerId,
+          })
 
-        // clear input
-        messageInput.value = ""
-        messageInput.focus()
-      }}>
-        <input
-          className="w-full rounded-l-lg p-2 border border-gray-900"
-          type="text"
-          id="text"
-          placeholder="Write a message..."
-        />
-        <button
-          type="submit"
-          className="py-2 px-2 bg-gray-900 text-white font-semibold hover:text-white border hover:bg-gray-600 border-gray-900 hover:border-transparent rounded-r-lg"
-        >
-          Send
-        </button>
-      </form>
+          // clear input
+          messageInput.value = ""
+          messageInput.focus()
+        }}>
+          <input
+            className="w-full rounded-l-lg p-2 border border-gray-900"
+            type="text"
+            id="text"
+            placeholder="Write a message..."
+          />
+          <button
+            type="submit"
+            className="py-2 px-2 bg-gray-900 text-white font-semibold hover:text-white border hover:bg-gray-600 border-gray-900 hover:border-transparent rounded-r-lg"
+          >
+            Send
+          </button>
+        </form>
+      </div>
     </section>
   )
 }
