@@ -36,8 +36,7 @@ function Chat({ streamerId }: { streamerId: number }) {
 
     if (!db) return
     if (!streamerId) return
-    const unsubChat = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId),  where('deleted', '==', false), orderBy('timestamp', 'asc')), async ({ docs }) => {
-    const unsubscribe = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId), orderBy('timestamp', 'desc')), async ({ docs }) => {
+    const unsubChat = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId),  where('deleted', '==', false), orderBy('timestamp', 'desc')), async ({ docs }) => {
       if (docs.length === 0) {
         setMessages([])
         return
