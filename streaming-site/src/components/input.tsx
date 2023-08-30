@@ -1,6 +1,6 @@
-import { Field } from 'formik';
-import { string, bool } from 'prop-types';
-import styled from 'tailwind-styled-components';
+import { Field } from "formik";
+import { string, bool } from "prop-types";
+import styled from "tailwind-styled-components";
 
 const StyledInput = styled.input`
   mt-2
@@ -52,7 +52,11 @@ function Input({ type, name, label, ...rest }: InputProps): JSX.Element {
             disabled={form.isSubmitting}
             {...rest}
           />
-          {form.touched[field.name] && form.errors[field.name] && <div className="text-red-500 dark:text-red-400 mt-2">{form.errors[field.name]}</div>}
+          {form.touched[field.name] && form.errors[field.name] && (
+            <div className="text-red-500 dark:text-red-400 mt-2">
+              {form.errors[field.name]}
+            </div>
+          )}
         </div>
       )}
     </Field>
@@ -60,8 +64,8 @@ function Input({ type, name, label, ...rest }: InputProps): JSX.Element {
 }
 
 Input.defaultProps = {
-  type: 'text',
-  placeholder: '',
+  type: "text",
+  placeholder: "",
   autoFocus: false,
 };
 

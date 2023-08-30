@@ -11,6 +11,7 @@
   "dependencies": {
     "@headlessui/react": "^1.7.16",
     "@heroicons/react": "^2.0.18",
+    "@next/swc-darwin-x64": "^13.4.19",
     "@stripe/react-stripe-js": "^2.1.2",
     "@stripe/stripe-js": "^2.0.0",
     "@types/node": "20.4.5",
@@ -27,10 +28,12 @@
     "flowbite": "^1.8.1",
     "formik": "^2.4.3",
     "next": "^13.4.19",
+    "next-share": "^0.25.0",
     "postcss": "8.4.27",
     "react": "^18.2.0",
     "react-bootstrap": "^2.8.0",
     "react-dom": "^18.2.0",
+    "react-google-recaptcha": "^3.1.0",
     "react-modal": "^3.16.1",
     "react-player": "^2.12.0",
     "react-responsive-modal": "^6.4.2",
@@ -41,6 +44,7 @@
     "yup": "^1.2.0"
   },
   "devDependencies": {
+    "@types/react-google-recaptcha": "^2.1.5",
     "@types/react-modal": "^3.16.0",
     "typescript": "^5.1.6"
   }
