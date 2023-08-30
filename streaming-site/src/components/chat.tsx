@@ -167,19 +167,24 @@ function Chat({ streamerId }: { streamerId: number }) {
                       new Date(message.timestamp.seconds * 1000)
                   )}
                 </span>
-                {
-                  // only show delete button if user is streamer or original commenter
-                  (userId === message.userId || isStreamer) && (
-                    <button
-                      className="text-red-500 text-xs hover:text-red-700"
-                      onClick={() => deleteChatMessage(message.messageId)}
-                    >
-                      🗑️
-                    </button>
-                  )
-                }
               </div>
-              <p className="text-gray-500">{message.text}</p>
+              <p className="text-gray-500">
+                {message.text}
+                <span className="float-right">
+                  {" "}
+                  {
+                    // only show delete button if user is streamer or original commenter
+                    (userId === message.userId || isStreamer) && (
+                      <button
+                        className="text-red-500 text-xs hover:text-red-700"
+                        onClick={() => deleteChatMessage(message.messageId)}
+                      >
+                        🗑️
+                      </button>
+                    )
+                  }
+                </span>
+              </p>
             </div>
           ))}
         </div>
