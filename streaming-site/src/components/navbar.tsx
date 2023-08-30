@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { onAuthStateChanged, signOut, Unsubscribe } from "firebase/auth";
+import { doc, onSnapshot } from "firebase/firestore";
 import { getFirebaseApp } from "../utils/firebase.config";
-import { signOut } from "firebase/auth";
-
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [user, setUser] = useState<any>(null);
+  const unsubUserRef = useRef<Unsubscribe>()
 
   useEffect(() => {
     const { auth, db } = getFirebaseApp();
@@ -18,21 +17,33 @@ function Navbar() {
       return;
     }
 
-    onAuthStateChanged(auth, (user) => {
+    const unsubAuth = onAuthStateChanged(auth, async (user) => {
+      if (unsubUserRef.current) return
       if (user) {
         const { uid } = user;
         const docRef = doc(db, "accounts", uid);
 
-        getDoc(docRef).then((userData) => {
-          if (!userData.exists()) {
+        unsubUserRef.current = onSnapshot(docRef, async (userSnap) => {
+          if (!userSnap.exists()) {
             console.error("Firebase Error: User does not exist in firestore");
             return;
           }
 
-          setUser(userData.data() as any);
-        });
+          if (userSnap.data()['banned']) {
+            signOut(auth)
+            alert('You are currently banned.')
+            console.log('banned')
+            setUser(null)
+            return
+          }
+          setUser(userSnap.data() as any)
+        })
       }
     });
+    return () => {
+      unsubAuth()
+      unsubUserRef.current && unsubUserRef.current()
+    }
   }, []);
 
   return (
@@ -161,6 +172,12 @@ function Navbar() {
                 {isOpen && (
                   <div className="absolute right-0 z-10 mt-1 w-28 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
+                      <Link
+                        href={`/${user?.name}`}
+                        className="text-gray-700 block px-4 py-2 text-sm"
+                      >
+                        Channel
+                      </Link>
                       <Link
                         href="/settings"
                         className="text-gray-700 block px-4 py-2 text-sm"
