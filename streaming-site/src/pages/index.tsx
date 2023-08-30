@@ -286,7 +286,7 @@ function Streams(): JSX.Element {
         {/*Display all categories*/}
         <section className="container mx-auto p-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {Array.from(uniqueCategories).map((category, index) => (
+            {Array.from(uniqueCategories).map((category: any, index) => (
               <div
                 key={index}
                 className="rounded overflow-hidden shadow-lg px-4 pt-2 py-4 bg-white"

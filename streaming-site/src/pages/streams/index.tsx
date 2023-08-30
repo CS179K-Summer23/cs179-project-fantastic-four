@@ -222,7 +222,7 @@ function Streams(): JSX.Element {
           <section>
             {activeTab === "categories" && (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-4">
-                {Array.from(uniqueCategories).map((category, index) => (
+                {Array.from(uniqueCategories).map((category: any, index) => (
                   <Link href={"/categories/" + category} key={index}>
                     <div className="rounded overflow-hidden shadow-lg p-4 bg-white hover:bg-gray-500 hover:text-white cursor-pointer">
                       {category}
