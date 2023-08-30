@@ -10,6 +10,7 @@ import Modal from "react-modal";
 import DonationForm from "../components/donation-form";
 import Chat from '../components/chat';
 import Bans from "../components/bans";
+import Mods from "../components/mods";
 
 import { Unsubscribe, onAuthStateChanged } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
@@ -18,6 +19,7 @@ import { getFirebaseApp } from "../utils/firebase.config";
 function StreamingRoom(): JSX.Element { 
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [modalManageBansIsOpen, setModalManageBansIsOpen] = useState(false);
+  const [modalManageModsIsOpen, setModalManageModsIsOpen] = useState(false);
   // const chatContainerRef = useRef<HTMLDivElement | null>(null);
   const [followedList, setFollowedList] = useState<string[]>([]);
 
@@ -69,6 +71,9 @@ function StreamingRoom(): JSX.Element {
     }
     const accountRef = accountSnap.docs[0].ref;
 
+    const confirmation = confirm(`Press Ok to Ban ${streamer?.name}.`)
+
+    if(!confirmation) return;
     await updateDoc(userRef, {banned: !isStreamerBanned});
     await updateDoc(accountRef, {banned: !isStreamerBanned });
 
@@ -167,7 +172,7 @@ function StreamingRoom(): JSX.Element {
       }
 
     }())
-  }, [router])
+  }, [router, streamer?.id])
 
   const openDonationModal = () => {
     setModalIsOpen(true);
@@ -175,6 +180,10 @@ function StreamingRoom(): JSX.Element {
 
   const openManageBansModal = () => {
     setModalManageBansIsOpen(true);
+  };
+
+  const openManageModsModal = () => {
+    setModalManageModsIsOpen(true);
   };
   
   return (
@@ -186,7 +195,9 @@ function StreamingRoom(): JSX.Element {
           <section className="w-full md:w-2/3 p-4">
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
             <div className="relative aspect-video" >
-                {!streamerLoading && streamer && !streamLoading && stream &&
+                {!streamerLoading && streamer &&
+                 !streamLoading && stream &&
+                 !isStreamerBanned &&
                 (<Player
                   controls
                   autoplay
@@ -252,12 +263,61 @@ function StreamingRoom(): JSX.Element {
                           <path
                             stroke-linecap="round"
                             stroke-linejoin="round"
-                            d="M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z"
+                            d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
                           />
                         </svg>
-                        {isStreamerBanned ? "Unban User" : "Ban User"}
+                        {isStreamerBanned ? "Unban Channel" : "Ban Channel"}
                       </button>)}
-                    
+
+                      {!isLoadingUser && user && 
+                    !streamerLoading && streamer &&
+                    !isStreamerBanned &&
+                    ((streamer.id == userId) || isAdmin ) && (
+                   <span> 
+                    <button
+                      className={`text-center ${
+                        "bg-blue-800"
+                      } text-white font-bold rounded-lg ml-1 px-2 py-1 hover:bg-gray-600`}
+                      onClick={openManageModsModal}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        className="w-6 h-6 inline-block mr-1"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
+                        />
+                      </svg>
+                      Manage Mods
+                    </button>
+                    <Modal
+                      isOpen={modalManageModsIsOpen}
+                      onRequestClose={() => setModalManageModsIsOpen(false)}
+                      contentLabel="Manage Mods Modal"
+                      style={{
+                        overlay: {
+                          backgroundColor: "rgba(0, 0, 0, 0.5)",
+                        },
+                        content: {
+                          maxWidth: "800px",
+                          maxHeight: "600px",
+                          margin: "auto",
+                          padding: "30px",
+                        },
+                      }}
+                    >
+                      <Mods streamerId={streamer?.id} streamerName={streamer?.name}
+                            onClose={() => {setModalManageModsIsOpen(false)}}/>
+                    </Modal>
+                    </span>)}
+
+
                   {!isLoadingUser && user && 
                     !streamerLoading && streamer &&
                     !isStreamerBanned &&
@@ -284,7 +344,7 @@ function StreamingRoom(): JSX.Element {
                           d="M12 3v17.25m0 0c-1.472 0-2.882.265-4.185.75M12 20.25c1.472 0 2.882.265 4.185.75M18.75 4.97A48.416 48.416 0 0012 4.5c-2.291 0-4.545.16-6.75.47m13.5 0c1.01.143 2.01.317 3 .52m-3-.52l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.988 5.988 0 01-2.031.352 5.988 5.988 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L18.75 4.971zm-16.5.52c.99-.203 1.99-.377 3-.52m0 0l2.62 10.726c.122.499-.106 1.028-.589 1.202a5.989 5.989 0 01-2.031.352 5.989 5.989 0 01-2.031-.352c-.483-.174-.711-.703-.59-1.202L5.25 4.971z"
                         />
                       </svg>
-                      Manage Chat Bans
+                      Manage Bans
                     </button>
                     <Modal
                       isOpen={modalManageBansIsOpen}

@@ -251,7 +251,7 @@ function Chat({ streamerId }: { streamerId: number }) {
             (!message.deleted) &&
             <div key={index} className="mb-2">
               <div className="flex items-center">
-                <span className="text-gray-400 text-xs pr-2">
+                <span className="text-gray-400 text-sm pr-2">
                   {formatTimestamp(message.timestamp && new Date(message.timestamp.seconds * 1000))}
                 </span>
                 <span className="text-gray-600 text-sm font-semibold">{message.username}</span>

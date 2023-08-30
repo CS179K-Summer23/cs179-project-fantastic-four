@@ -69,7 +69,7 @@ function Bans({ streamerId, streamerName, onClose }: { streamerId: number, strea
             unsubBans()
         }
     
-    }, [streamerId])
+    }, [streamerId, streamerName])
 
     const formatTimestamp = (timestamp: Date) => {
         const options: Intl.DateTimeFormatOptions = {
@@ -117,19 +117,19 @@ return (
         </button>
 
         <h2 className="font-bold text-2xl text-center border-b-2 text-m pb-2">
-          Manage {streamerName}'s Banned Users 
+          Manage {streamerName}&apos;s Banned Users 
         </h2>
         <div className="p-2 overflow-y-auto">
             <table width="100%">
                     <tr>
                         <th className="float-left">Banned User</th>
                         <th>Banned By</th>
-                        <th>Timestamp</th>
+                        <th>Banned Since</th>
                         <th className="float-right">Action</th>
                     </tr>
                 {!loadingBans && (bans.map((ban: BanEntry, i: number) => (
 
-                    <tr>
+                    <tr key={i}>
                         <td>{ban.userName}</td>
                         <td>{ban.bannedByName}</td>
                         <td className="text-center">{formatTimestamp(new Date(ban.timestamp.seconds * 1000))}</td>
