@@ -115,13 +115,18 @@ function StreamingRoom(): JSX.Element {
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
               <div className="relative aspect-video">
                 {stream !== null && !streamLoading && (
-                  <Player
-                    controls
-                    autoplay
-                    muted
-                    preload="auto"
-                    src={stream?.stream_url}
-                  />
+                  <>
+                    <Player
+                      controls
+                      autoplay
+                      muted
+                      preload="auto"
+                      src={stream?.stream_url}
+                    />
+                    <div className="absolute top-0 left-0 bg-red-500 text-white px-2 py-1 text-xs font-bold uppercase">
+                      Live
+                    </div>
+                  </>
                 )}
                 {/* {
                   streamer && streamLoading == false && (
@@ -145,12 +150,25 @@ function StreamingRoom(): JSX.Element {
                   </div>
                 )}
               </div>
-              <div className="mt-2">
-                <img
+              <div className="mt-2 items-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke-width="1.5"
+                  stroke="currentColor"
+                  className="w-10 h-10 inline-block float-left mt-2 mr-2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                {/* <img
                   src="https://cdn-icons-png.flaticon.com/512/149/149071.png?w=740&t=st=1691147917~exp=1691148517~hmac=eb6166a62265ce27b7afac68d87a03b748bc37c5361e49e55c8ced8a2f60e2db"
-                  className="mt-2 w-7 h-7 rounded-full float-left mr-2"
                   alt="Streamer avatar"
-                />
+                /> */}
                 <div className="flex justify-between items-center">
                   <h2 className="font-bold text-xl mb-2">
                     {stream?.title || streamer?.title}
@@ -223,8 +241,16 @@ function StreamingRoom(): JSX.Element {
                   </div>
                 </div>
 
-                <div className="flex justify-between items-center pl-9">
-                  <p className="text-gray-700 text-base">{streamer?.name}</p>
+                <div className="flex justify-between items-center  text-center">
+                  <p className="text-gray-700">
+                    {streamer?.name}
+                    <Link href="/categories">
+                      <span className="ml-3 hover:bg-gray-400 rounded-lg text-xs p-1 font-bold bg-gray-300">
+                        {stream?.category}
+                      </span>
+                    </Link>
+                  </p>
+
                   <span className="flex text-gray-600 text-m pr-6 pt-2">
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

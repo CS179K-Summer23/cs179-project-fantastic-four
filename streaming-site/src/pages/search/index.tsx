@@ -23,6 +23,7 @@ type SearchResult = {
   profilePictureUrl?: string;
   type: "Account" | "Stream" | "Category";
 };
+
 function Searchpage(): JSX.Element {
   const router = useRouter();
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -55,25 +56,26 @@ function Searchpage(): JSX.Element {
         })
         .filter((doc: any) =>
           fields.some((field) =>
-            doc[field]?.toLowerCase().includes(searchTerm.toLowerCase())
+            doc[field]
+              ? doc[field].toLowerCase().includes(searchTerm.toLowerCase())
+              : false
           )
         );
     };
 
-    const accountResults = await searchInCollection("accounts", ["name"]);
-    const streamResults = await searchInCollection("streams", [
+    const accountResults = await searchInCollection("accounts", [
+      "name",
       "title",
       "category",
     ]);
 
     const combinedResults = [
       ...accountResults.map((r) => ({ ...r, type: "Account" })),
-      ...streamResults.map((r) => ({ ...r, type: "Stream" })),
     ];
 
     // Deduplicate categories
     const uniqueCategories: any[] = [];
-    streamResults.forEach((result: any) => {
+    accountResults.forEach((result: any) => {
       if (
         result.category &&
         !uniqueCategories.find((cat) => cat.name === result.category)
@@ -107,7 +109,7 @@ function Searchpage(): JSX.Element {
         <div className="container mx-auto p-8">
           <h1 className="text-2xl font-semibold mb-4">
             Search Results for{" "}
-            <span className="text-blue-500">&quot;{searchTerm}&quot;</span>
+            <span className="text-blue-500">"{searchTerm}"</span>
           </h1>
 
           {searchResults.length === 0 ? (
@@ -125,39 +127,34 @@ function Searchpage(): JSX.Element {
                 );
                 if (filteredResults.length === 0) return null;
 
-                // Limit results to 8 if `showAllStreams` is false
                 const limitedResults = showAllStreams
                   ? filteredResults
                   : filteredResults.slice(0, 8);
 
-                // Mapping to user-friendly names
-                const displayType =
-                  type === "Account"
-                    ? "Related Users"
-                    : type === "Stream"
-                    ? "Related Streams"
-                    : "Related Categories";
+                const displayType = {
+                  Account: "Related Users",
+                  Stream: "Related Streams",
+                  Category: "Related Categories",
+                }[type];
 
                 return (
                   <section key={type}>
                     <h2 className="text-2xl font-bold my-4">{displayType}</h2>
-
                     {type === "Account" ? (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {limitedResults.map((account) => (
-                          <div
-                            key={account.id}
-                          
-                            // className="rounded overflow-hidden shadow-lg p-4 bg-white text-center"
-                          >
-                            <Link href={`/${account.name}`}>
+                          <div key={account.id}>
+                            <Link
+                              href={`/${account.name}`}
+                              className="hover:text-gray-500"
+                            >
                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke-width="1.5"
                                 stroke="currentColor"
-                                className="w-16 h-16 inline-block mr-1"
+                                className="w-8 h-8 inline-block mr-1"
                               >
                                 <path
                                   stroke-linecap="round"
@@ -165,76 +162,38 @@ function Searchpage(): JSX.Element {
                                   d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
                                 />
                               </svg>
-                              <span className="text-lg font-bold ">
                               {account.name}
-                            </span>
                             </Link>
                           </div>
-                          
                         ))}
                       </div>
-                    ) : type === "Category" ? (
+                    ) : type === "Stream" ? (
                       <div className="flex flex-wrap">
-                        {limitedResults.map((category) => (
-                          <div key={category.id} className="m-4">
-                            <span className="ml-2 text-lg font-semibold">
-                              {category.name}
-                            </span>
+                        {limitedResults.map((stream) => (
+                          <div
+                            key={stream.id}
+                            className="m-4 p-4 rounded bg-white shadow-lg"
+                          >
+                            <Link
+                              href={`/${stream.title}`}
+                              className="text-blue-500 hover:underline"
+                            >
+                              {stream.title}
+                            </Link>
                           </div>
                         ))}
                       </div>
                     ) : (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {limitedResults.map((result) => (
-                          <div
-                            key={result.id}
-                            className="rounded overflow-hidden shadow-lg p-4 bg-white"
-                          >
-                            <div className="mt-2">
-                              <Link
-                                href={`/${result.id}`}
-                                className="text-blue-500 hover:underline"
-                              >
-                                {result.name ||
-                                  result.title ||
-                                  result.description}
-                              </Link>
-                            </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
+                        {limitedResults.map((category) => (
+                          <div key={category.id}>
+                            <Link href="/categories">
+                              <div className="rounded overflow-hidden shadow-lg p-4 bg-white hover:bg-gray-500 hover:text-white cursor-pointer">
+                                {category.name}
+                              </div>
+                            </Link>
                           </div>
                         ))}
-                      </div>
-                    )}
-
-                    {filteredResults.length > 8 && (
-                      <div className="mt-4 flex items-center justify-center">
-                        <div className="flex-grow h-px bg-gray-300"></div>
-                        <button
-                          onClick={() => setShowAllStreams(!showAllStreams)}
-                          className="font-bold text-sm text-black mx-4 p-1 hover:text-white hover:bg-gray-800 hover:rounded-lg"
-                        >
-                          {showAllStreams
-                            ? "Show less"
-                            : `Show all ${displayType}`}
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke-width="1.5"
-                            stroke="currentColor"
-                            className="w-6 h-6 inline-block ml-1"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              d={
-                                showAllStreams
-                                  ? "M4.5 15.75l7.5-7.5 7.5 7.5"
-                                  : "M19.5 8.25l-7.5 7.5-7.5-7.5"
-                              }
-                            />
-                          </svg>
-                        </button>
-                        <div className="flex-grow h-px bg-gray-300"></div>
                       </div>
                     )}
                   </section>
@@ -244,7 +203,6 @@ function Searchpage(): JSX.Element {
           )}
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

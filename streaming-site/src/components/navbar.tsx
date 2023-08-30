@@ -34,7 +34,7 @@ function Navbar() {
 
     const searchInCollection = async (colName: string, fields: string[]) => {
       const collectionRef = collection(db, colName);
-      const snapshot = await getDocs(collectionRef); // No source option
+      const snapshot = await getDocs(collectionRef); 
       return snapshot.docs
         .map((doc) => {
           const data = doc.data();
@@ -48,25 +48,26 @@ function Navbar() {
         })
         .filter((doc: any) =>
           fields.some((field) =>
-            doc[field]?.toLowerCase().includes(searchTerm.toLowerCase())
+            doc[field]
+              ? doc[field].toLowerCase().includes(searchTerm.toLowerCase())
+              : false
           )
         );
     };
 
-    const accountResults = await searchInCollection("accounts", ["name"]);
-    const streamResults = await searchInCollection("streams", [
+    const accountResults = await searchInCollection("accounts", [
+      "name",
       "title",
       "category",
     ]);
 
     const combinedResults = [
       ...accountResults.map((r) => ({ ...r, type: "Account" })),
-      ...streamResults.map((r) => ({ ...r, type: "Stream" })),
     ];
 
     // Deduplicate categories
     const uniqueCategories: any[] = [];
-    streamResults.forEach((result: any) => {
+    accountResults.forEach((result: any) => {
       if (
         result.category &&
         !uniqueCategories.find((cat) => cat.name === result.category)
@@ -111,9 +112,9 @@ function Navbar() {
 
   useEffect(() => {
     if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, [isDarkMode]);
 
@@ -202,18 +203,13 @@ function Navbar() {
           </form>
           {searchTerm && isInputFocused && (
             <div className="absolute top-full left-0 w-full bg-white rounded z-10 shadow-lg">
-              {searchResults.slice(0, 8).map(
-                (
-                  user,
-                  index // Only take first 8 results
-                ) => (
-                  <Link href={`/search?term=${searchTerm}`} key={index}>
-                    <div className="p-3 border-b last:border-b-0 hover:bg-gray-100 rounded">
-                      {user.name || user.title || user.description}
-                    </div>
-                  </Link>
-                )
-              )}
+              {searchResults.slice(0, 8).map((result, index) => (
+                <Link href={`/search?term=${searchTerm}`} key={index}>
+                  <div className="p-3 border-b last:border-b-0 hover:bg-gray-100 rounded">
+                    {result.name || result.title || result.description}
+                  </div>
+                </Link>
+              ))}
               {searchResults.length > 8 && (
                 <Link href={`/search?term=${searchTerm}`}>
                   <div className="p-3 text-gray-700 hover:bg-gray-100 rounded">
@@ -281,7 +277,7 @@ function Navbar() {
                       >
                         Settings
                       </Link>
-                      
+
                       <button
                         className="text-gray-700 block px-4 py-2 text-sm"
                         onClick={async () => {

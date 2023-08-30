@@ -24,6 +24,7 @@ function Settingpage(): JSX.Element {
     stream_key: string;
     title: string;
     description: string;
+    category: string;
   };
   const [user, setProfile] = useState<any>(null);
   const [userPublic, setPublicProfile] = useState<any>(null);
@@ -138,7 +139,7 @@ function Settingpage(): JSX.Element {
           <h1 className="text-3xl font-bold mb-4">Settings</h1>
           <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
-          <section className="mb-8">
+          {/* <section className="mb-8">
             <h2 className="text-xl font-bold mb-4">Profile Picture</h2>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative flex items-center">
               <div className="flex items-center">
@@ -164,13 +165,13 @@ function Settingpage(): JSX.Element {
                   alt="Profile"
                   className="w-16 h-16 rounded-full"
                 /> */}
-                <input type="file" name="profilePicture" className="ml-4" />
+          {/* <input type="file" name="profilePicture" className="ml-4" />
                 <button className="bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded ml-4">
                   Update Profile Picture
                 </button>
               </div>
-            </div>
-          </section>
+            </div> */}
+          {/* </section> */}
 
           <section>
             <h2 className="text-xl font-bold mb-4">Profile Settings</h2>
@@ -315,7 +316,7 @@ function Settingpage(): JSX.Element {
         </div>
       </main>
 
-      <Footer/>
+      <Footer />
     </div>
   );
 }
