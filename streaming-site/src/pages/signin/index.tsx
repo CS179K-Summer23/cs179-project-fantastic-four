@@ -1,16 +1,17 @@
-import { useState } from "react";
-import Redirect from "next/router";
-import Head from "next/head";
-import Link from "next/link";
-import { Formik, Form } from "formik";
-import { object, string } from "yup";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import Input from "../../components/input";
-import { getFirebaseApp } from "../../utils/firebase.config";
+import { useState } from 'react'
+import Redirect from 'next/router'
+import Head from 'next/head'
+import Link from 'next/link'
+import { Formik, Form } from 'formik'
+import { object, string } from 'yup'
+import { signInWithEmailAndPassword, signOut } from "firebase/auth"
+import Input from '../../components/input'
+import { getFirebaseApp } from '../../utils/firebase.config'
+import { doc, getDoc } from "firebase/firestore";
 
 function SignIn() {
-  const [error, setError] = useState(null);
-  const { auth } = getFirebaseApp();
+  const [error, setError] = useState(null)
+  const { auth, db } = getFirebaseApp()
 
   return (
     <div className="flex justify-center items-center m-6 md:m-0 flex-col h-full">
@@ -42,12 +43,34 @@ function SignIn() {
             }
 
             signInWithEmailAndPassword(auth, email, password)
-              .then(() => Redirect.push("/"))
+              .then((userCredential) => {
+                const docRef = doc(db, "accounts", userCredential.user.uid);
+
+                getDoc(docRef).then((userData) => {
+                  if (!userData.exists()) {
+                    console.error("Firebase Error: User Account does not exist in firestore");
+                    return;
+                  }
+                  const userId = userData.data()['id'] 
+                  const isBanned = userData.data()['banned'] 
+
+                  if(isBanned) {
+                    signOut(auth)
+                    const errorMessage: any = "You are currently banned."
+                    setError(errorMessage)
+                    setSubmitting(false)
+                    return
+                  }
+                  return Redirect.push('/');
+                })
+              })
               .catch((error) => {
-                const errorMessage = error.message;
-                setError(errorMessage);
-                setSubmitting(false);
-              });
+                let errorMessage = error.message
+                if (errorMessage.includes('wrong-password')) errorMessage = 'Wrong Password'
+                if (errorMessage.includes('user-not-found')) errorMessage = 'Wrong Email'
+                setError(errorMessage)
+                setSubmitting(false)
+              })
           }}
         >
           {({ handleSubmit, isSubmitting }) => (

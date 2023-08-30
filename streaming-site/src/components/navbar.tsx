@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import { onAuthStateChanged } from "firebase/auth";
 import {
-  doc,
   getDoc,
   getDocs,
   collection,
@@ -10,8 +8,9 @@ import {
   query,
   where,
 } from "firebase/firestore";
+import { onAuthStateChanged, signOut, Unsubscribe } from "firebase/auth";
+import { doc, onSnapshot } from "firebase/firestore";
 import { getFirebaseApp } from "../utils/firebase.config";
-import { signOut } from "firebase/auth";
 
 function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false); // For side menu
@@ -82,6 +81,7 @@ function Navbar() {
 
     setSearchResults([...combinedResults, ...uniqueCategories]);
   };
+  const unsubUserRef = useRef<Unsubscribe>()
 
   useEffect(() => {
     const { auth, db } = getFirebaseApp();
@@ -91,32 +91,43 @@ function Navbar() {
       return;
     }
 
-    onAuthStateChanged(auth, (user) => {
+    const unsubAuth = onAuthStateChanged(auth, async (user) => {
+      if (unsubUserRef.current) return
       if (user) {
         const { uid } = user;
         const docRef = doc(db, "accounts", uid);
 
-        getDoc(docRef).then((userData) => {
-          if (!userData.exists()) {
+        unsubUserRef.current = onSnapshot(docRef, async (userSnap) => {
+          if (!userSnap.exists()) {
             console.error("Firebase Error: User does not exist in firestore");
             return;
           }
-
-          setUser(userData.data());
-        });
+          if (userSnap.data()['banned']) {
+            signOut(auth)
+            alert('You are currently banned.')
+            console.log('banned')
+            setUser(null)
+            return
+          }
+          setUser(userSnap.data() as any)
+        })
       }
     });
-
     handleSearch(db, searchTerm, setSearchResults);
-  }, [searchTerm]);
 
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+    return () => {
+      unsubAuth()
+      unsubUserRef.current && unsubUserRef.current()
     }
-  }, [isDarkMode]);
+  }, []);
+
+useEffect(() => {
+  if (isDarkMode) {
+    document.documentElement.classList.add("dark");
+  } else {
+    document.documentElement.classList.remove("dark");
+  }
+}, [isDarkMode]);
 
   return (
     <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 py-1">
@@ -271,6 +282,12 @@ function Navbar() {
                 {isSettingsOpen && (
                   <div className="absolute right-0 z-10 mt-1 w-28 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                     <div className="py-1">
+                      <Link
+                        href={`/${user?.name}`}
+                        className="text-gray-700 block px-4 py-2 text-sm"
+                      >
+                        Channel
+                      </Link>
                       <Link
                         href="/settings"
                         className="text-gray-700 block px-4 py-2 text-sm"
