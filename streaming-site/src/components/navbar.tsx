@@ -34,7 +34,7 @@ function Navbar() {
 
     const searchInCollection = async (colName: string, fields: string[]) => {
       const collectionRef = collection(db, colName);
-      const snapshot = await getDocs(collectionRef); 
+      const snapshot = await getDocs(collectionRef);
       return snapshot.docs
         .map((doc) => {
           const data = doc.data();
@@ -289,7 +289,7 @@ function Navbar() {
 
                           try {
                             await signOut(auth);
-                            location.reload();
+                            location.href = "/";
                           } catch (e) {
                             alert("Error signing out");
                             return;
@@ -304,7 +304,6 @@ function Navbar() {
               </div>
             </>
           )}
-
           {!user && (
             <>
               <Link
