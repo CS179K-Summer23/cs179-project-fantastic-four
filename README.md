@@ -14,24 +14,47 @@ Zhenjie Liu - 2314577483
 
 # Technologies 
 
-React  
+React 
+Nextjs
 Express  
-WebRTC  
+Stripe  
 nginx-rtmp-server  
-Socket.io  
+Video.js
+Tailwind
 Firebase Authentication and Firestore
+
+Website Live on Vercel
+Streaming Server hosted on a Google Cloud VM
+Database stored in Firestore
+
 
 # Major Features:
 
-1.Transmit video (WebRTC)  
-2.Receive video (WebRTC)  
-3.Authentication   
-4.Sending/Deleting Messages in Chat (Websockets)  
+
+1.Authentication
+2.Sending/Deleting Messages in Chat 
+3.Ban users from a specific chat or the whole website
+4.Different roles like streamer, global admin, moderator - chat badges
 5.Store chat history   
 6.Profile Page with user information like a bio  
-7.Donation system w/ Stripe (???)  
-8.Viewer count, stream title, and other streaming information about the video being   
-9.Following streamers and email notifications  
+7.Donation and Subscription system w/ Stripe
+8. Viewer count, stream title, category and other streaming information about the video being   
+9. Following streamers and email notifications  
+10. Search for category, or user, or streams (title, description, streamer name, category name)
+
+# In Progress Features:
+1. Profile Picture
+2. Dark Mode
+3. Listing Past Streams
+4. Donation History
+
+# Future Features:
+1. Recommendation System
+2. VOD history and Clips
+3. emotes, global and per channel
+4. sub badges
+5. linking external social media to profile
+
 
 # User Stories
 As a viewer, I want to be able to watch livestreams so that I can be entertained. (4 points)
@@ -48,9 +71,9 @@ As a streamer, I want to be able to delete messages in my chat, as well as allow
 
 As a streamer, I want to check the chat history when I was streaming. So I can interact with viewers. (1 point)
 
-As a user, I want to be able to add information to my profile because I want to be able to personalize my profile. (1 point)
-
 As a user, I want to be able to donate to streamers because I want to be able to support the content creators that I am familiar with. (1 point)
+
+As a user, I want to be able to add information to my profile because I want to be able to personalize my profile. (1 point)
 
 As a user, I want to check my donation history so I can check which streamer I have donated. (1 point)
 
