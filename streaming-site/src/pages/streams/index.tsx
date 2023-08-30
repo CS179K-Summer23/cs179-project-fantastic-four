@@ -31,9 +31,11 @@ function Streams(): JSX.Element {
     name: string;
     avatar_url: string;
   }
-
+  
   const [streams, setStreams] = useState<any>(null);
   const [streamers, setStreamers] = useState<Streamer[]>([]);
+
+
 
 
   useEffect(() => {
@@ -48,19 +50,19 @@ function Streams(): JSX.Element {
 
     const fetchStreamer = async (streamer_id: string) => {
       const streamerQuery = query(
-        usersRef,
+        usersRef, 
         where("id", "==", streamer_id)
       );
 
       const userSnapshot = await getDocs(streamerQuery);
       return userSnapshot.docs[0].data();
-    };
-
+      };
+    
     const fetchStreams = async () => {
       const streamsQuery = query(
         collection(db, 'streams'),
         orderBy('view_count', 'desc')
-      );
+      ); 
       const streamsSnapshot = await getDocs(streamsQuery);
 
       const streamsArr: any[] = await Promise.all(streamsSnapshot.docs
@@ -70,12 +72,12 @@ function Streams(): JSX.Element {
       }));
 
       const streamersArr: any[] = await Promise.all(streamsArr
-        .map(async (stream) => {
+        .map( async(stream) => {
           return await fetchStreamer(stream['streamer_id'])
             .then(async (data) => {
               return data;
-            });
-        }));
+          });
+      }));
 
       return [streamsArr, streamersArr];
     };
@@ -87,66 +89,8 @@ function Streams(): JSX.Element {
     }).catch(error => {
       console.log(error);
     })
-
+    
   }, [streamers, streams]);
-
-  useEffect(() => {
-    let streamers: any = null;
-    let streamerIds: any[] = [];
-
-    const userRetrieval = setInterval(async function () {
-      /* retrieve users from firestore every 5 seconds */
-      const { auth, db } = getFirebaseApp();
-      if (!auth || !db) {
-        console.error("Firebase not available");
-        return;
-      }
-
-      const usersRef = getDocs(collection(db, "users"));
-      const usersSnapshot = await usersRef;
-      if (streamers === null) {
-        streamers = usersSnapshot.docs.map((doc) => doc.data()).filter((user) => {
-          if (user['streaming_status'] === true) {
-            streamerIds.push(user['id']);
-            return true
-          }
-
-          return false
-        });
-      }
-      else {
-      streamers.forEach(async (streamer: any) => {
-        try {
-          await fetch('/api/send-notification', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-              streamer: streamer,
-              users: usersSnapshot.docs.map((doc) => ({
-                ...doc.data(),
-                // email: 'jairedjawed@icloud.com'
-              }))
-            })
-          })
-        }
-        catch (error) {
-          console.log(error);
-        }
-      })
-
-
-      // filter streamers that are different from the previous snapshot that are streaming
-      streamers = usersSnapshot.docs.map((doc) => doc.data()).filter((user) => user['streaming_status'] === true && !streamerIds.includes(user['id']))
-    }
-
-    }, 1000);
-
-    return () => {
-      clearTimeout(userRetrieval);
-    }
-  }, [])
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -167,9 +111,7 @@ function Streams(): JSX.Element {
                           src={stream.stream_url}
                           poster={stream.thumbnail_url}
                         />  
-
                     </div>
-                  </Link>
 
                     <div className="">
                       <Link href={'/' + streamers[i].name}>
@@ -214,21 +156,32 @@ function Streams(): JSX.Element {
                             href={'/' + streamers[i].name}
                             className="text-sm text-gray-700 hover:text-gray-500"
                           >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
-                            />
-                          </svg>
-                          {stream?.view_count}
-                        </span>
+                            {streamers[i].name}
+                          </Link>
+                          <span className="flex text-gray-600 text-m pr-6 pt-2">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                      />
+                    </svg>
+                    {stream?.view_count}
+                  </span>
+                        </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
+                ))}
+              </div> 
         </div>
       </main>
       <Footer></Footer>
