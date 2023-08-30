@@ -36,7 +36,7 @@ function Chat({ streamerId }: { streamerId: number }) {
 
     if (!db) return
     if (!streamerId) return
-    const unsubChat = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId),  where('deleted', '==', false), orderBy('timestamp', 'asc')), async ({ docs }) => {
+    const unsubChat = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId),  where('deleted', '==', false), orderBy('timestamp', 'desc')), async ({ docs }) => {
       if (docs.length === 0) {
         setMessages([])
         return
@@ -93,7 +93,7 @@ function Chat({ streamerId }: { streamerId: number }) {
           .then(async (data) => {
             if (data.exists()) {
               const userId = data.data()['id']
-              setUserId(userId) 
+              setUserId(userId)
               setStreamerStatus(userId === streamerId)
 
               // Check if User is banned from stream
@@ -239,17 +239,17 @@ function Chat({ streamerId }: { streamerId: number }) {
 
   return (
     <section
-      className="flex flex-col justify-between w-full h-full overflow-scroll md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
+      className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg h-1/3"
       style={{ maxWidth: "350px" }}
     >
-      <div className="bg-white">
+      <div className="bg-white h-4/5">
         <h2 className="font-bold text-center border-b-2 text-m pb-1">
           STREAM CHAT
         </h2>
-        <div className="chat-container p-2 m-0 overflow-y-auto">
+        <div className="chat-container flex flex-col-reverse p-2 m-0 h-full overflow-y-scroll">
           {messages.map((message: Message, index: number) => (
             (!message.deleted) &&
-            <div key={index} className="mb-2">
+            <div key={index} className="mb-4">
               <div className="flex items-center">
                 <span className="text-gray-400 text-sm pr-2">
                   {formatTimestamp(message.timestamp && new Date(message.timestamp.seconds * 1000))}
@@ -289,9 +289,10 @@ function Chat({ streamerId }: { streamerId: number }) {
         </div>
       </div>
 
+
         { (!isLoadingUser && user && !isBannedFromStream) && (
-          <div>
-            <form className="my-4 flex bg-white m" onSubmit={async (e) => {
+          <div className="h-1/5 mt-4 mb-2 pb-2 bg-white relative">
+            <form className="flex absolute bottom-0 w-full" onSubmit={async (e) => {
               e.preventDefault()
       
               if (!db) {
