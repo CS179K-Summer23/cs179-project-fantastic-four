@@ -15,3 +15,15 @@ Expect Outcome: List all related streamer names/categories/keywords on the botto
 
 Test Case: Click the search button
 Expect Outcome: Go to the search  page and list all related streamer names/categories/keywords in different layouts
+
+
+4. User story: As a user, I want to be able to see the most popular streams on the homepage
+
+Test Case: Open the homepage
+Expect Outcome: Display the most popular 3 live streams.
+
+Test Case: CLick prev and next buttons
+Expect Outcome: Display each stream and loop in index of 3
+
+Test Case: There are not any live streams
+Expect Outcome: Display nothing
