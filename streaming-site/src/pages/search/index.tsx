@@ -109,7 +109,7 @@ function Searchpage(): JSX.Element {
         <div className="container mx-auto p-8">
           <h1 className="text-2xl font-semibold mb-4">
             Search Results for{" "}
-            <span className="text-blue-500">"{searchTerm}"</span>
+            <span className="text-blue-500">&quot;{searchTerm}&quot;</span>
           </h1>
 
           {searchResults.length === 0 ? (

@@ -87,7 +87,7 @@ function CategoryLists(): JSX.Element {
 
       return () => unsubCategory();
     })();
-  }, [router, queryCategory]);
+  }, [router, queryCategory, streamName]);
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">

@@ -119,7 +119,7 @@ function Navbar() {
       unsubAuth()
       unsubUserRef.current && unsubUserRef.current()
     }
-  }, []);
+  }, [searchTerm]);
 
 useEffect(() => {
   if (isDarkMode) {
