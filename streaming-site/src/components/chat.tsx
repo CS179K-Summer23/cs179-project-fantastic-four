@@ -239,14 +239,14 @@ function Chat({ streamerId }: { streamerId: number }) {
 
   return (
     <section
-      className="flex flex-col justify-between w-full h-full overflow-scroll md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
-      style={{ maxWidth: "350px" }}
+      className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
+      style={{ maxWidth: "350px", height: "81vh" }}
     >
-      <div className="bg-white">
+      <div className="bg-white h-full overflow-auto">
         <h2 className="font-bold text-center border-b-2 text-m pb-1">
           STREAM CHAT
         </h2>
-        <div className="chat-container p-2 m-0 overflow-y-auto">
+        <div className="chat-container p-2 m-0">
           {messages.map((message: Message, index: number) => (
             (!message.deleted) &&
             <div key={index} className="mb-2">
@@ -283,7 +283,7 @@ function Chat({ streamerId }: { streamerId: number }) {
                   )
                 }
               </div>
-              <p>{message.text}</p>
+              <p className="break-words">{message.text}</p>
             </div>
           ))}
         </div>
