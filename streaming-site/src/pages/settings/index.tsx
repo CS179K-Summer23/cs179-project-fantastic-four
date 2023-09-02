@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from "react";
 import Navbar from "../../components/navbar";
 import Footer from "../../components/footer";
-import Redirect from 'next/router'
+import Redirect from "next/router";
 import Link from "next/link";
 import { onAuthStateChanged, updateEmail  } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
@@ -15,16 +15,17 @@ function isEmailValid(email: string): boolean {
 
 function Settingpage(): JSX.Element {
   type UserType = {
-    name: string
-    profilePicture: string
-    email: string
-    birthday: number,
-    age: number,
-    debit: number,
-    stream_key: string
-    title: string
-    description: string
-  }
+    name: string;
+    profilePicture: string;
+    email: string;
+    birthday: number;
+    age: number;
+    debit: number;
+    stream_key: string;
+    title: string;
+    description: string;
+    category: string;
+  };
   const [user, setProfile] = useState<any>(null);
   const [userChanges, setProfileChanges] = useState<any>({});
   const [userPublic, setPublicProfile] = useState<any>(null);
@@ -33,7 +34,7 @@ function Settingpage(): JSX.Element {
   useEffect(() => {
     const { auth, db } = getFirebaseApp();
 
-    if (!auth || !db ) {
+    if (!auth || !db) {
       console.error("Firebase not available");
       return;
     }
@@ -42,28 +43,30 @@ function Settingpage(): JSX.Element {
       if (user) {
         const { uid } = user;
         const docRef = doc(db, "accounts", uid);
-        
+
         getDoc(docRef).then((userData) => {
           if (!userData.exists()) {
-            console.error("Firebase Error: User Account does not exist in firestore");
+            console.error(
+              "Firebase Error: User Account does not exist in firestore"
+            );
             return;
           }
-          const userId = userData.data()['id']
+          const userId = userData.data()["id"];
           setProfile(userData.data() as UserType);
           setProfileChanges(userData.data() as UserType);
 
-          getDoc(doc(db, "users", '' + userId)).then((userPublicData) => {
+          getDoc(doc(db, "users", "" + userId)).then((userPublicData) => {
             if (!userPublicData.exists()) {
-              console.error("Firebase Error: User User does not exist in firestore");
+              console.error(
+                "Firebase Error: User User does not exist in firestore"
+              );
               return;
             }
-  
+
             setPublicProfile(userPublicData.data() as typeof user);
             setPublicProfileChanges(userPublicData.data() as typeof user);
           });
         });
-
-
       } else {
         console.log("No user signed in");
         setProfile(null)
@@ -192,7 +195,7 @@ function Settingpage(): JSX.Element {
           <h1 className="text-3xl font-bold mb-4">Settings</h1>
           <hr className="h-px my-4 bg-gray-200 border-0 dark:bg-gray-700" />
 
-          <section className="mb-8">
+          {/* <section className="mb-8">
             <h2 className="text-xl font-bold mb-4">Profile Picture</h2>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative flex items-center">
               <div className="flex items-center">
@@ -218,13 +221,13 @@ function Settingpage(): JSX.Element {
                   alt="Profile"
                   className="w-16 h-16 rounded-full"
                 /> */}
-                <input type="file" name="profilePicture" className="ml-4" />
+          {/* <input type="file" name="profilePicture" className="ml-4" />
                 <button className="bg-gray-900 hover:bg-gray-700 text-white px-4 py-2 rounded ml-4">
                   Update Profile Picture
                 </button>
               </div>
-            </div>
-          </section>
+            </div> */}
+          {/* </section> */}
 
           <section>
             <h2 className="text-xl font-bold mb-4">Profile Settings</h2>
@@ -294,7 +297,7 @@ function Settingpage(): JSX.Element {
                     className="w-full p-2 mt-1 rounded border cursor-not-allowed"
                   />
                 </div>
-                
+
                 <div className="col-span-1">
                   <label htmlFor="debit" className="text-gray-700">
                     Debit
@@ -318,7 +321,7 @@ function Settingpage(): JSX.Element {
           </section>
 
           <section>
-          <h2 className="mt-8 text-xl font-bold mb-4">Stream Settings</h2>
+            <h2 className="mt-8 text-xl font-bold mb-4">Stream Settings</h2>
             <div className="rounded overflow-hidden shadow-lg p-4 bg-white relative">
               <div className="grid grid-rows-3 gap-4 w-full">
                 <div className="col-span-1">
@@ -369,7 +372,7 @@ function Settingpage(): JSX.Element {
         </div>)}
       </main>
 
-      <Footer></Footer>
+      <Footer />
     </div>
   );
 }

@@ -1,15 +1,18 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from 'next/router'
-import { doc, getDoc, getDocs, query, collection, where, onSnapshot, addDoc, serverTimestamp, deleteDoc, updateDoc } from "firebase/firestore";
+import { doc, getDoc, getDocs, query, collection, where, onSnapshot, addDoc, deleteDoc, updateDoc, Timestamp } from "firebase/firestore";
 import Navbar from "../components/navbar";
 import Footer from "../components/footer";
 import Player from "../components/player";
 import Modal from "react-modal";
-import DonationForm from "../components/donation-form";
 import Chat from '../components/chat';
 import Bans from "../components/bans";
 import Mods from "../components/mods";
+import Share from "../components/share";
+import Link from "next/link";
+import { checkout } from "../components/checkout";
+
 
 import { Unsubscribe, onAuthStateChanged } from "firebase/auth";
 import { getFirebaseApp } from "../utils/firebase.config";
@@ -76,7 +79,7 @@ function StreamingRoom(): JSX.Element {
         await addDoc(collection(db, 'follows'), {
           followerId: user.uid,
           followingId: streamerUserId,
-          followTime: serverTimestamp(),
+          followTime: Timestamp.now(),
         })
       }
       catch (error) {
@@ -87,6 +90,11 @@ function StreamingRoom(): JSX.Element {
       setFollowedList([...followedList, streamerUserId]);
     }
   };
+
+const handleDonate = async () => {
+  window.location.href = "https://buy.stripe.com/test_00gg1R5O83QoaKk6op"
+}
+
 const handleBan = async () => {
   const { auth, db } = getFirebaseApp();
 
@@ -240,10 +248,6 @@ const handleBan = async () => {
     }())
   }, [router, streamer?.id])
 
-  const openDonationModal = () => {
-    setModalIsOpen(true);
-  };
-
   const isFollowed = followedList.includes(streamer?.id);
 
   const openManageBansModal = () => {
@@ -255,67 +259,101 @@ const handleBan = async () => {
   };
   
   return (
-    <div className="flex flex-col min-h-screen bg-gray-100">
+    <div className="flex flex-col bg-gray-100">
       <Navbar />
-
-      <div className="flex-1 flex flex-col md:flex-row">
-        <div className="container mx-auto py-2 flex flex-col-reverse md:flex-row">
-          <section className="w-full md:w-2/3 p-4">
+      <div className="flex-1 flex flex-col sm:flex-row">
+        <div className="container flex flex-col mb-auto sm:flex-row " >
+        <section className="w-full sm:w-2/3" >
             <div className="rounded overflow-hidden shadow-lg p-2 bg-white">
-            <div className="relative aspect-video" >
-                {!streamerLoading && streamer &&
-                 !streamLoading && stream &&
-                 !isStreamerBanned &&
-                (<Player
-                  controls
-                  autoplay
-                  muted
-                  preload="auto"
-                  src={stream?.stream_url}
-                />)}
-                {
-                  streamerLoading && (
-                    <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
-                      <p className="text-black text-2xl">Loading...</p>
-                    </div>
-                  )
-                }
-                {
-                  !streamerLoading && !streamer && !isStreamerBanned && (
-                    <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
-                      <p className="text-black text-2xl">No user with this name exists</p>
-                    </div>
-                  )
-                }
-                {
-                  !streamerLoading && streamer && isStreamerBanned && (
-                    <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
-                      <p className="text-black text-2xl">This user is currently banned</p>
-                    </div>
-                  )
-                }
-                {
-                  streamer && !isStreamerBanned &&!streamLoading && !stream &&  (
-                    <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
-                      <p className="text-black text-2xl">{streamer?.name} is not currently live</p>
-                    </div>
-                  )
-                }
-              </div>
-              {(!streamerLoading && streamer && (!isStreamerBanned || isAdmin)) && (<div className="mt-2">
-                <img
-                  src="https://cdn-icons-png.flaticon.com/512/149/149071.png?w=740&t=st=1691147917~exp=1691148517~hmac=eb6166a62265ce27b7afac68d87a03b748bc37c5361e49e55c8ced8a2f60e2db"
-                  className="mt-2 w-7 h-7 rounded-full float-left mr-2"
-                  alt="Streamer avatar"
-                />
-                <div className="flex justify-between items-center">
-                  <h2 className="font-bold text-xl mb-2">{streamer?.title}</h2>
-                  <div className="text-gray-600 text-m pt-2">
-                  {!isLoadingUser && user && 
+              <div className="relative aspect-video" >
+                  {!streamerLoading && streamer &&
+                  !streamLoading && stream &&
+                  !isStreamerBanned &&
+                  (<Player
+                    controls
+                    autoplay
+                    muted
+                    preload="auto"
+                    src={stream?.stream_url}
+                  />)}
+                  {
+                    streamerLoading && (
+                      <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+                        <p className="text-black text-2xl">Loading...</p>
+                      </div>
+                    )
+                  }
+                  {
+                    !streamerLoading && !streamer && !isStreamerBanned && (
+                      <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+                        <p className="text-black text-2xl">No user with this name exists</p>
+                      </div>
+                    )
+                  }
+                  {
+                    !streamerLoading && streamer && isStreamerBanned && (
+                      <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+                        <p className="text-black text-2xl">This user is currently banned</p>
+                      </div>
+                    )
+                  }
+                  {
+                    streamer && !isStreamerBanned &&!streamLoading && !stream &&  (
+                      <div className="absolute top-0 left-0 w-full h-full bg-gray-900 bg-opacity-50 flex justify-center items-center">
+                        <p className="text-black text-2xl">{streamer?.name} is not currently live</p>
+                      </div>
+                    )
+                  }
+                </div>
+              {(!streamerLoading && streamer && (!isStreamerBanned || isAdmin)) && (
+              <div className="mt-2">
+                <div className="flex flex-col justify-between">
+                  <div className="flex items-center">                   
+                   <h2 className="pl-4 lg:overflow-hidden lg:whitespace-nowrap lg:text-ellipsis text-left font-bold text-xl">{streamer?.title}</h2>
+                  </div>
+                  <div className="pl-4 pt-1 flex text-center items-center">
+                      <img
+                        src="149071_64x64_1_25.png"
+                        className=" w-7 h-7 rounded-full mr-2"
+                        alt="Streamer avatar"
+                      />
+                      <p className="text-gray-700 items-center">
+                        {streamer?.name}
+                      </p>
+                      {!streamLoading && stream && (
+                    <Link href={"/categories/" + stream?.category}>
+                    <span className="ml-2 hover:bg-gray-400 rounded-lg text-xs p-1 font-bold bg-gray-300">
+                      {stream?.category}
+                    </span>
+                    </Link>)}
+                    {stream && (
+                    <span className="flex ml-auto text-gray-600 text-m pr-4">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        className="w-6 h-6"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                        />
+                      </svg>
+                      {stream?.view_count}
+                    </span>
+                    )}
+                  </div>
+                  <div className="relative overflow-wrap flex flex-row ">
+
+                    <div className="justify-end pr-4 text-right ml-auto text-gray-600 text-m pt-2">
+                    {!isLoadingUser && user && 
                     !streamerLoading &&
                      ((streamer && !(streamer.id == userId)) || isStreamerBanned) &&
                       isAdmin && (<button
-                        className={`text-center ${
+                        className={` mt-1 text-center whitespace-nowrap flex-nowrap  ${
                           isStreamerBanned ? "bg-green-800" : "bg-red-800"
                         } text-white font-bold rounded-lg ml-1 px-2 py-1 hover:bg-gray-600`}
                         onClick={handleBan}
@@ -343,7 +381,7 @@ const handleBan = async () => {
                     ((streamer.id == userId) || isAdmin ) && (
                    <span> 
                     <button
-                      className={`text-center ${
+                      className={` mt-1 whitespace-nowrap flex-nowrap text-center ${
                         "bg-blue-800"
                       } text-white font-bold rounded-lg ml-1 px-2 py-1 hover:bg-gray-600`}
                       onClick={openManageModsModal}
@@ -362,7 +400,7 @@ const handleBan = async () => {
                           d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"
                         />
                       </svg>
-                      Manage Mods
+                        Manage Mods
                     </button>
                     <Modal
                       isOpen={modalManageModsIsOpen}
@@ -386,14 +424,14 @@ const handleBan = async () => {
                     </span>)}
 
 
-                  {!isLoadingUser && user && 
+                    {!isLoadingUser && user && 
                     !streamerLoading && streamer &&
                     !isStreamerBanned &&
                     ((streamer.id == userId) || isAdmin || isMod ) && (
                    <span> 
                       
                     <button
-                      className={`text-center ${
+                      className={` mt-1 text-center whitespace-nowrap flex-nowrap ${
                         "bg-green-800"
                       } text-white font-bold rounded-lg ml-1 px-2 py-1 hover:bg-gray-600`}
                       onClick={openManageBansModal}
@@ -439,7 +477,7 @@ const handleBan = async () => {
                     !streamerLoading && streamer &&
                     !isStreamerBanned &&
                      !(streamer.id == userId) && (<button
-                      className={`ml-1 text-center text-white font-bold rounded-lg px-2 py-1 ${followListLoading ? "bg-gray-600" : isFollowed ? "bg-gray-900" : "bg-gray-800"} hover:bg-gray-600`}
+                      className={` mt-1 ml-1 text-center whitespace-nowrap flex-nowrap  text-white font-bold rounded-lg px-2 py-1 ${followListLoading ? "bg-gray-600" : isFollowed ? "bg-gray-900" : "bg-gray-800"} hover:bg-gray-600`}
                       onClick={handleFollow}
                     >
                       <svg
@@ -458,9 +496,10 @@ const handleBan = async () => {
                       </svg>
                       {followListLoading ? "Loading..." : isFollowed ? "Following" : "Follow"}
                     </button>)}
-
-                    {!streamerLoading && streamer &&
-                    !isStreamerBanned && (<button className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600">
+                      <button
+                        className={` mt-1 text-center whitespace-nowrap flex-nowrap  bg-gray-900 text-white font-bold rounded-lg ml-1 px-2 py-1 hover:bg-gray-600`}
+                        onClick={handleDonate}
+                      >
                       <svg
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
@@ -472,77 +511,52 @@ const handleBan = async () => {
                         <path
                           stroke-linecap="round"
                           stroke-linejoin="round"
-                          d="M7.217 10.907a2.25 2.25 0 100 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186l9.566-5.314m-9.566 7.5l9.566 5.314m0 0a2.25 2.25 0 103.935 2.186 2.25 2.25 0 00-3.935-2.186zm0-12.814a2.25 2.25 0 103.933-2.185 2.25 2.25 0 00-3.933 2.185z"
+                          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
                         />
                       </svg>
-                      Share
-                    </button>)}
-                    {!isLoadingUser && user && 
-                     !streamerLoading && streamer &&
-                     !isStreamerBanned &&
-                     !(streamer.id == userId) && ( 
-                     <button
-                      onClick={openDonationModal} // Open the modal on click
-                      className="text-center ml-1 mt-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" className="w-6 h-6 inline-block mr-1">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
                       Donate
-                    </button>)}
+                  </button>
+                  <button
+                      onClick={async () => {
+                          await checkout({
+                              mode: 'subscription',
+                              lineItems: [
+                                  {
+                                      price: "price_1NiPx7EqkNVKC3nWMPuRCPTc",
+                                      quantity: 1
+                                  }
+                              ],
+                          });
 
-                    <Modal
-                      isOpen={modalIsOpen}
-                      onRequestClose={() => setModalIsOpen(false)}
-                      contentLabel="Donation Modal"
-                      style={{
-                        overlay: {
-                          backgroundColor: "rgba(0, 0, 0, 0.5)",
-                        },
-                        content: {
-                          maxWidth: "800px",
-                          maxHeight: "600px",
-                          margin: "0 auto",
-                          padding: "30px",
-                        },
                       }}
-                    >
-                      <DonationForm onClose={() => setModalIsOpen(false)} />
-                    </Modal>
+                      className=" mt-1 text-center ml-1 whitespace-nowrap flex-nowrap  bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
+                  >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        className="w-6 h-6 inline-block mr-1"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"                        />
+                      </svg>
+                      Subscribe
+                  </button>
+                  <Share streamerName={streamer?.name}></Share>
                   </div>
                 </div>
-
-                <div className="flex justify-between items-center pl-9">
-                  <p className="text-gray-700 text-base">
-                    {streamer?.name}
-                  </p>
-                  {stream && (
-                  <span className="flex text-gray-600 text-m pr-6 pt-2">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke-width="1.5"
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
-                      />
-                    </svg>
-                    {stream?.view_count}
-                  </span>)}
-                </div>
-              </div>)}
-            </div>
-          </section>
-          {!streamerLoading && streamer && !isStreamerBanned && (<Chat streamerId={streamer?.id} />)}
+              </div>
+            </div>)}
+          </div>
+        </section>
+        {!streamerLoading && streamer && !isStreamerBanned && (<Chat streamerId={streamer?.id} />)}
         </div>
       </div>
-
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 }
