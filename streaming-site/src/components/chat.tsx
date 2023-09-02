@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react'
-import { query, doc, where, orderBy, onSnapshot, collection, addDoc, getDoc, serverTimestamp, deleteDoc, getDocs, QuerySnapshot, updateDoc } from 'firebase/firestore'
+import { query, doc, where, orderBy, onSnapshot, collection, addDoc, getDoc, getDocs, updateDoc, Timestamp } from 'firebase/firestore'
 import { Unsubscribe, onAuthStateChanged } from 'firebase/auth'
 import { getFirebaseApp } from '../utils/firebase.config'
 
-type Timestamp = {
+type TimestampType = {
   seconds: number
   nanoseconds: number
 }
@@ -11,7 +11,7 @@ type Timestamp = {
 type Message = {
   text: string
   username: string
-  timestamp: Timestamp
+  timestamp: TimestampType
   streamerId: number
   messageId: string
   userId: number
@@ -36,7 +36,7 @@ function Chat({ streamerId }: { streamerId: number }) {
 
     if (!db) return
     if (!streamerId) return
-    const unsubChat = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId),  where('deleted', '==', false), orderBy('timestamp', 'desc')), async ({ docs }) => {
+    const unsubChat = onSnapshot(query(collection(db, 'chat'), where('streamerId', '==', streamerId),  where('deleted', '==', false), orderBy('timestamp', 'asc')), async ({ docs }) => {
       if (docs.length === 0) {
         setMessages([])
         return
@@ -93,7 +93,7 @@ function Chat({ streamerId }: { streamerId: number }) {
           .then(async (data) => {
             if (data.exists()) {
               const userId = data.data()['id']
-              setUserId(userId)
+              setUserId(userId) 
               setStreamerStatus(userId === streamerId)
 
               // Check if User is banned from stream
@@ -152,6 +152,7 @@ function Chat({ streamerId }: { streamerId: number }) {
       minute: "2-digit",
       hour12: true,
     }
+    if (!timestamp) return;
     return new Intl.DateTimeFormat("en-US", options).format(timestamp)
   }
 
@@ -211,7 +212,7 @@ function Chat({ streamerId }: { streamerId: number }) {
     await addDoc(collection(db, "bans"), {
       streamerId,
       userId: authorId,
-      timestamp: serverTimestamp(),
+      timestamp: Timestamp.now(),
       bannedById: userId
     })
     
@@ -239,22 +240,23 @@ function Chat({ streamerId }: { streamerId: number }) {
 
   return (
     <section
-      className="flex flex-col justify-between w-full md:w-1/3 mt-4 pt-2 px-2 bg-white shadow-lg"
-      style={{ maxWidth: "350px", height: "81vh" }}
+      className="flex w-full sm:w-1/3 flex-col pt-2 md:pt-0"
+      style={{ height: "91vh"}}
     >
-      <div className="bg-white h-full overflow-auto">
+      <div className="flex rounded shadow-lg min-h-full  h-0 p-2 bg-white flex-col">
         <h2 className="font-bold text-center border-b-2 text-m pb-1">
           STREAM CHAT
         </h2>
-        <div className="chat-container p-2 m-0">
+        <div className="overflow-auto flex flex-col-reverse">
+        <div className="grow p-2 snap-y snap-proximity">
           {messages.map((message: Message, index: number) => (
             (!message.deleted) &&
-            <div key={index} className="mb-4">
+            <div key={index} className="snap-start pb-2">
               <div className="flex items-center">
-                <span className="text-gray-400 text-sm pr-2">
-                  {formatTimestamp(message.timestamp && new Date(message.timestamp.seconds * 1000))}
+                <span className="text-gray-400 text-md pr-2">
+                  {message.timestamp && (formatTimestamp(message.timestamp && new Date(message.timestamp.seconds * 1000)))}
                 </span>
-                <span className="text-gray-600 text-sm font-semibold">{message.username}</span>
+                <span className="text-gray-600 overflow-hidden whitespace-nowrap text-ellipsis text-sm font-semibold">{message.username}</span>
                 {(streamerId == message.userId) && 
                  (<img alt="Streamer" className="pl-2" src="streamer.png"></img>)}
                 {!(streamerId == message.userId) && chatters[message.userId]?.isAdmin && 
@@ -264,7 +266,7 @@ function Chat({ streamerId }: { streamerId: number }) {
                 {
                   (!(userId === message.userId) && (isStreamer || isAdmin || isMod)) && (
                     <button
-                      className="text-red-800 text-xs pr-1 ml-auto"
+                      className="text-red-800 text-xs pl-2 pr-1 ml-auto"
                       onClick={() => banMessageAuthor(message.userId)}
                     >
                       Ban
@@ -283,16 +285,14 @@ function Chat({ streamerId }: { streamerId: number }) {
                   )
                 }
               </div>
-              <p className="break-words">{message.text}</p>
+              <p className="break-all">{message.text}</p>
             </div>
           ))}
         </div>
-      </div>
-
-
+        </div>
         { (!isLoadingUser && user && !isBannedFromStream) && (
-          <div className="h-1/5 mt-4 mb-2 pb-2 bg-white relative">
-            <form className="flex absolute bottom-0 w-full" onSubmit={async (e) => {
+          <div className="mt-auto mb-4">
+            <form className="flex" onSubmit={async (e) => {
               e.preventDefault()
       
               if (!db) {
@@ -317,7 +317,7 @@ function Chat({ streamerId }: { streamerId: number }) {
               await addDoc(collection(db, 'chat'), {
                 text: message,
                 userId,
-                timestamp: serverTimestamp(),
+                timestamp: Timestamp.now(),
                 streamerId,
                 deleted: false
               })
@@ -332,12 +332,13 @@ function Chat({ streamerId }: { streamerId: number }) {
             <input
               className="w-full rounded-l-lg pl-8 p-2 border-2 border-gray-900"
               type="text"
+              autoComplete='off'
               id="text"
               placeholder="Write a message..."
             />
             <button
               type="submit"
-              className="py-2 px-2 bg-gray-900 text-white font-semibold hover:text-white border hover:bg-gray-600 border-gray-900 hover:border-transparent rounded-r-lg"
+              className="px-2 bg-gray-900 text-white font-semibold hover:text-white border hover:bg-gray-600 border-gray-900 hover:border-transparent rounded-r-lg"
             >
               Send
             </button>
@@ -346,7 +347,7 @@ function Chat({ streamerId }: { streamerId: number }) {
         )}
         { (!isLoadingUser && user && isBannedFromStream) && (
             <input
-            className="w-full my-4 text-center rounded-lg p-2 border-2 border-red-700"
+            className="w-full mt-auto mb-4 text-center rounded-lg p-2 border-2 border-red-700"
             type="text"
             id="text"
             disabled
@@ -356,13 +357,15 @@ function Chat({ streamerId }: { streamerId: number }) {
         )}
         { (!isLoadingUser && !userId) && (
             <input
-            className="w-full my-4 text-center rounded-lg p-2 border-2 border-black"
+            className="w-full mt-auto my-4 text-center rounded-lg p-2 border-2 border-black"
             type="text"
             id="text"
             disabled
             placeholder="Login or Signup to Chat"
           />
-        )}
+        )} 
+        
+    </div>
     </section>
   )
 }

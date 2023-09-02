@@ -91,7 +91,7 @@ function Streams(): JSX.Element {
     };
 
     const fetchCategories = async () => {
-      const streamsQuery = query(collection(db, "streams"));
+      const streamsQuery = query(collection(db, "streams"), where("end_time", "==", null));
       const streamsSnapshot = await getDocs(streamsQuery);
 
       const categoriesArr: string[] = streamsSnapshot.docs
@@ -135,7 +135,7 @@ function Streams(): JSX.Element {
             }`}
             onClick={() => setActiveTab("categories")}
           >
-            Categories
+            Live Categories
           </button>
 
           <section className="my-8">
@@ -143,10 +143,14 @@ function Streams(): JSX.Element {
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4">
                 {streams &&
                   streams.map((stream: Stream, i: number) => (
-                    <Link href={"/" + streamers[i].name} key={i}>
+                    <div
+                    key={i}
+                    className="rounded overflow-hidden shadow-lg p-4 bg-white"
+                  >
+                    <Link href={"/" + streamers[i].name}>
                       <div
                         key={stream.id}
-                        className="rounded overflow-hidden shadow-lg p-4 bg-white"
+                        className=""
                       >
                         <div className="relative pb-3/2">
                           <Player
@@ -162,9 +166,19 @@ function Streams(): JSX.Element {
                         </div>
 
                         <div className="">
-                          <section>
-                            <div className="flex p-1">
-                              <svg
+                          <section className="flex flex-col">
+                            <div className="p-1">
+                              <h3 className="overflow-hidden whitespace-nowrap text-ellipsis font-bold text-xl hover:text-gray-500">
+                                {stream.title}
+                              </h3>
+                            </div>
+                            <Link className="" href={"/categories/" + stream?.category}>
+                            <span className=" hover:bg-gray-400 rounded-lg text-xs p-1 font-bold bg-gray-300">
+                              {stream?.category}
+                            </span>
+                            </Link>
+                            <div className="flex mt-2 items-center text-gray-500 ">
+                               <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 fill="none"
                                 viewBox="0 0 24 24"
@@ -178,13 +192,6 @@ function Streams(): JSX.Element {
                                   d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
                                 />
                               </svg>
-
-                              <h3 className="font-bold text-xl hover:text-gray-500">
-                                {stream.title}
-                              </h3>
-                            </div>
-
-                            <div className="flex justify-between items-center text-gray-500 pl-10">
                               <Link
                                 href={"/" + streamers[i].name}
                                 className="text-gray-600 hover:text-gray-800"
@@ -192,7 +199,7 @@ function Streams(): JSX.Element {
                                 {streamers[i].name}
                               </Link>
 
-                              <span className="flex justify-end items-center text-gray-500">
+                              <span className="flex  grow justify-end items-center text-gray-500">
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
                                   fill="none"
@@ -214,6 +221,7 @@ function Streams(): JSX.Element {
                         </div>
                       </div>
                     </Link>
+                    </div>
                   ))}
               </div>
             )}

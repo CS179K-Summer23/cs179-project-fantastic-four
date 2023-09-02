@@ -20,6 +20,7 @@ function Navbar() {
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [isInputFocused, setInputFocused] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleSearch = async (
     db: Firestore,
@@ -110,8 +111,10 @@ function Navbar() {
             return
           }
           setUser(userSnap.data() as any)
+          setIsLoading(false);
         })
       }
+      else setIsLoading(false);
     });
     handleSearch(db, searchTerm, setSearchResults);
 
@@ -130,7 +133,7 @@ useEffect(() => {
 }, [isDarkMode]);
 
   return (
-    <nav className="flex items-center justify-between bg-gray-900 flex-wrap px-6 py-1">
+    <nav className="flex items-center py-2 lg:py-0 justify-between bg-gray-900 flex-wrap px-6">
       <div className="flex items-center flex-shrink-0 text-white mr-6">
         <Link href="/" className="font-semibold text-xl tracking-tight">
           Fantastic Four
@@ -143,7 +146,7 @@ useEffect(() => {
         >
           <svg
             className={`fill-current h-3 w-3 ${
-              isMenuOpen ? "hidden" : "block"
+             "block"
             }`}
             viewBox="0 0 20 20"
             xmlns="http://www.w3.org/2000/svg"
@@ -160,7 +163,7 @@ useEffect(() => {
         <div className="text-sm lg:flex-grow">
           <Link
             href="/"
-            className="block mt-4 lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
+            className="block lg:inline-block lg:mt-0 text-teal-200 hover:text-white mr-4"
           >
             Home
           </Link>
@@ -180,9 +183,9 @@ useEffect(() => {
         </div>
 
         <div className="relative">
-          <form className="text-sm mr-20 flex pb-2">
+          <form className="text-sm mr-20 flex">
             <input
-              className="bg-grey-lighter rounded py-2 mt-4 mb-2 px-4 w-full"
+              className="bg-grey-lighter rounded py-0 mt-2 mb-2 px-4 w-full"
               type="search"
               placeholder="Search"
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -192,7 +195,7 @@ useEffect(() => {
             <Link href={`/search?term=${searchTerm}`}>
               <button
                 type="submit"
-                className="p-2 ml-1 mt-4 mb-2 text-sm font-medium text-white rounded border border-white-700 hover:text-teal-500 hover:bg-white  dark:bg-blue-600 dark:hover:bg-blue-700"
+                className="p-2 ml-1 mt-2 mb-2 text-sm font-medium text-white rounded border border-white-700 hover:text-teal-500 hover:bg-white  dark:bg-blue-600 dark:hover:bg-blue-700"
               >
                 <svg
                   className="w-4"
@@ -321,7 +324,7 @@ useEffect(() => {
               </div>
             </>
           )}
-          {!user && (
+          {!isLoading && !user && (
             <>
               <Link
                 href="/signin"

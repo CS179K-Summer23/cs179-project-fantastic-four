@@ -10,15 +10,15 @@ import {
   InstagramIcon,
   InstapaperShareButton,
 } from "next-share";
-function Share() {
+function Share({ streamerName }: { streamerName: string }) {
   const [isOpen, setIsOpen] = useState(false);
-  const url = "http://localhost:3000/streamingroom1";
-  const title = "Check out my article!";
+  const url = `${window.location.origin}/${streamerName}`;
+  const title = "Check out my Stream!";
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative mt-1 inline-block text-left">
       <button
-        className="text-center ml-1 bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
+        className="text-center ml-1  whitespace-nowrap flex-nowrap  bg-gray-900 text-white font-bold rounded-lg px-2 py-1 hover:bg-gray-600"
         onClick={() => setIsOpen(!isOpen)}
       >
         <svg
